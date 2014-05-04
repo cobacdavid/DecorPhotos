@@ -1,4 +1,21 @@
 set theme(0) {
+     for {set i 0} {$i<$nbLignes} {incr i} {
+	set texte [lindex $lignes $i]
+	foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
+	set Xoff $cw
+	set X [expr {$w-$fw-1*$Xoff}]
+	# ATTENTION $fd est négatif !
+	# ou encore pour la ligne suivante : set Y [expr {$h-($nbLignes-$i)*(-$fd+$fa)}]
+	set Y [expr {$h-($nbLignes-$i)*($fa)}]
+	$draw annotation [expr {$X+2}] [expr {$Y-2}] $texte
+	$draw annotation $X $Y $texte
+	if { $X < $minX } {set minX $X}
+	if { $Y < $minY } {set minY $Y}
+    }
+    # insertion logo
+    set wL   $(user:tLogo)
+    set hL   [expr {$wL*$hLogo/$wLogo}] 
+    set minY [expr {$minY - $fa}]
     # le logo
     $logo resize $wL $hL 
     $wand composite $logo over [expr {int($fa)}] [expr {int($fa)}]
@@ -15,13 +32,42 @@ set theme(0) {
 set docTheme(0) {logo en haut à gauche + lignes verticale et horizontale + lignes de textes}
 
 set theme(1) {
-    # le logo 
-    #pixane scale p logo -to $fa $fa -width $wL -height $hL -quality 9
+    for {set i 0} {$i<$nbLignes} {incr i} {
+	set texte [lindex $lignes $i]
+	foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
+	set Xoff $cw
+	set X [expr {$w-$fw-1*$Xoff}]
+	# ATTENTION $fd est négatif !
+	# ou encore pour la ligne suivante : set Y [expr {$h-($nbLignes-$i)*(-$fd+$fa)}]
+	set Y [expr {$h-($nbLignes-$i)*($fa)}]
+	$draw annotation [expr {$X+2}] [expr {$Y-2}] $texte
+	$draw annotation $X $Y $texte
+	if { $X < $minX } {set minX $X}
+	if { $Y < $minY } {set minY $Y}
+    }
+    # insertion logo
+    set wL   $(user:tLogo)
+    set hL   [expr {$wL*$hLogo/$wLogo}] 
+    set minY [expr {$minY - $fa}]
+    # le logo
     $logo resize $wL $hL 
     $wand composite $logo over [expr {int($fa)}] [expr {int($fa)}]
 }
 set docTheme(1) {logo seul en haut à gauche + lignes de textes}
 
 set theme(2) {
+    for {set i 0} {$i<$nbLignes} {incr i} {
+	set texte [lindex $lignes $i]
+	foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
+	set Xoff $cw
+	set X [expr {$w-$fw-1*$Xoff}]
+	# ATTENTION $fd est négatif !
+	# ou encore pour la ligne suivante : set Y [expr {$h-($nbLignes-$i)*(-$fd+$fa)}]
+	set Y [expr {$h-($nbLignes-$i)*($fa)}]
+	$draw annotation [expr {$X+2}] [expr {$Y-2}] $texte
+	$draw annotation $X $Y $texte
+	if { $X < $minX } {set minX $X}
+	if { $Y < $minY } {set minY $Y}
+    }
 }
-set docTheme(2) {lignes de textes seules}
+set docTheme(2) {lignes de textes seules en bas à droite}

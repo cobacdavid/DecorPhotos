@@ -67,33 +67,15 @@ $draw fontsize $(user:tPolice)
 $draw strokecolor $userFg
 $draw fillcolor   $userBg
 $draw textantialias 1
-# traitement du texte
-for {set i 0} {$i<$nbLignes} {incr i} {
-    set texte [lindex $lignes $i]
-    foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
-    set Xoff $cw
-    set X [expr {$w-$fw-1*$Xoff}]
-    # ATTENTION $fd est négatif !
-    # ou encore pour la ligne suivante : set Y [expr {$h-($nbLignes-$i)*(-$fd+$fa)}]
-    set Y [expr {$h-($nbLignes-$i)*($fa)}]
-    $draw annotation [expr {$X+2}] [expr {$Y-2}] $texte
-    $draw annotation $X $Y $texte
-    if { $X < $minX } {set minX $X}
-    if { $Y < $minY } {set minY $Y}
-}
-# insertion logo
-set wL   $(user:tLogo)
-set hL   [expr {$wL*$hLogo/$wLogo}] 
-set minY [expr {$minY - $fa}]
 # exécution du thème choisi
 eval $theme($(user:choixTheme))
+# insertion du dessin dans l'image
 $wand draw $draw
 # sauvegarde 
 if {$test eq 0} {
     file mkdir $(user:dOut) 
     eval $wand write [file join $(user:dOut) $(user:fOut)]
 } else {
-    # set format [expr {4/3.}]
     set canvas .h.c
     set wcv [$canvas cget -width]
     set hcv [$canvas cget -height]
