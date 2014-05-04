@@ -285,8 +285,8 @@ array set {} "
     tLogo      200
     tLine      6
     tPolice    60
-    fOut       Rabelais_\$inFile
-    fLogo      [file join $r logoRabelais.jpg]
+    fOut       perso_\$inFile
+    fLogo      [file join $r logo.jpg]
     fPolice    Courier
     fRc        [file join $h decorphoto.rc]
 "

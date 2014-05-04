@@ -113,7 +113,7 @@ pack $h.b -fill x
 pack $h.c
 
 ###
-canvas .moi  -relief groove -width 20 -height 18
+canvas .moi  -relief groove -width 20 -height 30
 set mafonte {Times 14 bold}
 set logo {
     2 1 D {-anchor nw}
@@ -123,7 +123,7 @@ foreach {x y t opt} $logo {
     eval .moi create text $x $y -text $t $opt
 }
 bind .moi <1> {tk_messageBox -message \
-		   "Auteur: David Cobac (david.cobac@gmail.com)\nAvril 2010-Avril 2014"\
+		   "David Cobac david.cobac@gmail.com\nMade In Angers (49)\nAvril 2010-Mai 2014"\
 		   -title information -type ok}
 
 ###
