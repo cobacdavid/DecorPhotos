@@ -89,22 +89,22 @@ proc callback:choixCoul {wlabel} {
     $wlabel configure -bg $(user:couleur)
 }
 
-proc callback:choixPol {wentry} {
-    global {}
+# proc callback:choixPol {wentry} {
+#     global {}
 
-    set type {
-	{{Fichier ttf} {.ttf}}
-	{{Tous les fichiers} {.*}}
-    }
-    set p [tk_getOpenFile -initialdir [file dirname $(user:fPolice)] -filetypes $type]
-    if {$p ne ""} {
-	set (user:fPolice) $p
-	$wentry delete 0 end
-	$wentry insert end $p
-    }
-}
+#     set type {
+# 	{{Fichier ttf} {.ttf}}
+# 	{{Tous les fichiers} {.*}}
+#     }
+#     set p [tk_getOpenFile -initialdir [file dirname $(user:fPolice)] -filetypes $type]
+#     if {$p ne ""} {
+# 	set (user:fPolice) $p
+# 	$wentry delete 0 end
+# 	$wentry insert end $p
+#     }
+# }
 
-proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryPol wentryTPol wbutton {test 0}} {
+proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wbutton {test 0}} {
     global {} theme fDPhoto
     
     set (user:dImages) [$wentryRep get]
@@ -112,14 +112,14 @@ proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryPol
     set (user:dOut)    [$wentryRepS get]
     set (user:fOut)    [$wentryOut get]
     set (user:lignes)  [$wentryLin get]
-    set (user:fPolice) [$wentryPol get]
+    #set (user:fPolice) [$wentryPol get]
     set (user:tPolice) [$wentryTPol get]
     
     ### vérifications avant traitement
     if {$(user:dImages) eq "" || $(user:fOut) eq ""} {return}
     if {![file exists $(user:dImages)]} {return}
     if {![file exists $(user:fLogo)]} {return}
-    if {![file exists $(user:fPolice)]} {return}
+    #if {![file exists $(user:fPolice)]} {return}
     ###
     cd $(user:dImages)
     set listeJPG [glob -nocomplain *.jpg]
@@ -287,7 +287,7 @@ array set {} "
     tPolice    60
     fOut       Rabelais_\$inFile
     fLogo      [file join $r logoRabelais.jpg]
-    fPolice    [file join $r police.ttf]
+    fPolice    Courier
     fRc        [file join $h decorphoto.rc]
 "
 

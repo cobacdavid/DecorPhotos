@@ -1,133 +1,111 @@
 #!/bin/sh
 # -*-Tcl-*-
 # The next line restarts using tclsh \
-exec etcl "$0" -- ${1+"$@"}
+exec tclsh8.5 "$0" -- ${1+"$@"}
 
 
-# auteur : david cobac [string map {# @} david.cobac#gmail.com]
-# date   : 15/04/2010
-# rev    : 05/06/2010
+# auteur : david cobac [string map {# @} david.cobac#free.fr]
+# date   : 04/05/2014
 
-package require pixane
-
-#set police [pixfont create -builtin arial]
-set police [pixfont create -file $(user:fPolice)]
-
-catch {pixane delete p}
-pixane create p
-pixane load p -file $inFile
-catch {pixane delete logo}
-pixane create logo
-pixane load logo -file $(user:fLogo)
-
- #if {[regexp {(\$date)|(\$heure)} $(user:lignes) ]} {
-    foreach {k v} [jpeg::formatExif [jpeg::getExif $inFile]] {
-	if {$k eq "DateTimeOriginal"} {
-	    regexp {([0-9]{4}):([0-9]+):([0-9]+)\
-			([0-9]+):([0-9]+):([0-9]+)} $v -> y m d H M S
-	    set date  "$d/$m/$y"
-	    set heure ${H}:${M}:${S}
-	    set mois [clock format [clock scan "$y$m$d $heure"]\
-			  -format %B -locale fr]
-	    set Mois [string toupper $mois 0 0]
-	} elseif {$k eq "Orientation"} {
-	    set normal [string equal $v "normal"]
-	    if [string equal $v "90 degrees cw"] {
-		set angle 1.5707963267948966
-	    } elseif [string equal $v "90 degrees ccw"] {
-		set angle -1.5707963267948966
-	    }
+# création des outils
+set wand  [magick create wand]
+set logo  [magick create wand]
+set draw  [magick create draw]
+set pixel [magick create pixel]
+set black [magick create pixel]
+$black color black
+set userFg  [magick create pixel]
+$userFg color $(user:couleurf)
+set userBg  [magick create pixel]
+$userBg color $(user:couleur)
+set police $(user:fPolice)
+# chargement de l'image
+$wand ReadImage $inFile
+# chargement du logo
+$logo ReadImage $(user:fLogo)
+# récupération des infos de l'image
+foreach {k v} [jpeg::formatExif [jpeg::getExif $inFile]] {
+    if {$k eq "DateTimeOriginal"} {
+	regexp {([0-9]{4}):([0-9]+):([0-9]+)\
+		    ([0-9]+):([0-9]+):([0-9]+)} $v -> y m d H M S
+	set date  "$d/$m/$y"
+	set heure ${H}:${M}:${S}
+	set mois [clock format [clock scan "$y$m$d $heure"]\
+		      -format %B -locale fr]
+	set Mois [string toupper $mois 0 0]
+    } elseif {$k eq "Orientation"} {
+	set normal [string equal $v "normal"]
+	if [string equal $v "90 degrees cw"] {
+	    set angle 90
+	} elseif [string equal $v "90 degrees ccw"] {
+	    set angle -90
 	}
     }
-    ## vérification de la récupération des variables
-    if {![info exists date] || ![info exists heure]} {
+}
+if {![info exists date] || ![info exists heure]} {
 	tk_messageBox -icon error -message "Erreur de récupération\
 de l'heure et/ou de la date
 Plusieurs causes sont possibles..."
-	return
-    }
-    ##
-#}
-
-set w [pixane width p]
-set h [pixane height p]
-##
-if {$normal eq 0} {
-    pixane create np
-    pixane resize np $h $w
-    pixane blank np
-    pixane scale np p -angle $angle
-    pixane delete p
-    pixane create p
-    pixane resize p $h $w
-    pixane blank p
-    pixane copy p np
-    pixane delete np
-    set wt $w
-    set w $h
-    set h $wt
+    return
 }
-##
-set wLogo [pixane width logo]
-set hLogo [pixane height logo]
-
+# rotation si image en portrait
+if {$normal eq 0} {
+    $wand RotateImage $black $angle
+}
+set w     [$wand width]
+set h     [$wand height]
+set wLogo [$logo width]
+set hLogo [$logo height]
+# 
 set lignes [split [subst $(user:lignes)] \n]
-# on supprime les lignes vides
-#while {[set ind [lsearch $lignes ""]] ne -1} {
-#    set lignes [lreplace $lignes $ind $ind]
-#}
 set nbLignes [llength $lignes]
 set minX $w
 set minY $h
-## erreur de segmentation sur cette commande !!
-foreach {fa fd} [pixfont metrics $police $(user:tPolice)] break
-
+# on installe la police utilisée dans la zone de dessin
+$draw font     $police
+$draw fontsize $(user:tPolice)
+$draw strokecolor $userFg
+$draw fillcolor   $userBg
+$draw textantialias 1
+# traitement du texte
 for {set i 0} {$i<$nbLignes} {incr i} {
     set texte [lindex $lignes $i]
-    foreach {fw n n} [pixfont measure $police $(user:tPolice) $texte] break
-    set Xoff $fa
-    set X [expr {$w-$fw-2*$Xoff}]
-    set Y [expr {$h-($nbLignes-$i)*($fd+$fa)}]
-    pixane color p $(user:couleurf)
-    pixane text p [expr {$X+2}] [expr {$Y-2}] -font $police -size $(user:tPolice) -text $texte -align left
-    pixane color p $(user:couleur)
-    pixane text p $X $Y -font $police -size $(user:tPolice) -text $texte -align left
-    #
+    foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
+    set Xoff $cw
+    set X [expr {$w-$fw-1*$Xoff}]
+    # ATTENTION $fd est négatif !
+    # ou encore pour la ligne suivante : set Y [expr {$h-($nbLignes-$i)*(-$fd+$fa)}]
+    set Y [expr {$h-($nbLignes-$i)*($fa)}]
+    $draw annotation $X $Y $texte
     if { $X < $minX } {set minX $X}
     if { $Y < $minY } {set minY $Y}
 }
-
-set wL $(user:tLogo)
-set hL [expr {$wL*$hLogo/$wLogo}] 
+$wand draw $draw
+# insertion logo
+set wL   $(user:tLogo)
+set hL   [expr {$wL*$hLogo/$wLogo}] 
 set minY [expr {$minY - $fa}]
-
-# exécution des commandes du thème choisi
+# exécution du thème choisi
 eval $theme($(user:choixTheme))
-
+# sauvegarde 
 if {$test eq 0} {
-    file mkdir $(user:dOut)
-    eval pixane save p -file [file join $(user:dOut) $(user:fOut)] -format jpeg
+    file mkdir $(user:dOut) 
+    eval $wand write [file join $(user:dOut) $(user:fOut)]
 } else {
-    set format [expr {4/3.}]
+    # set format [expr {4/3.}]
     set canvas .h.c
     set wcv [$canvas cget -width]
     set hcv [$canvas cget -height]
-    catch {pixane delete q}
-    pixane create q
-    if {$w > $h} {
-	pixane resize q $wcv $hcv
-	pixane blank q
-	pixane scale q p -to 0 0 -width $wcv 
-    } else {
-	pixane resize q $wcv $hcv
-	pixane blank q
-	pixane scale q p -to 0 0 -height $hcv -width [expr {int($hcv/$format)}]
-    }
-    image create photo cv
-    pixcopy q cv
-    # hardcoding sur le canvas :(
-    .h.c create image 0 0 -image cv -anchor nw
+    set cv [image create photo]
+    $wand resize $wcv $hcv
+    magicktophoto $wand $cv    
+    .h.c create image 0 0 -image $cv -anchor nw
 }
-
-pixane delete logo
-pixane delete p
+#
+magick delete $draw
+magick delete $wand
+magick delete $logo
+magick delete $pixel
+magick delete $black
+magick delete $userBg
+magick delete $userFg

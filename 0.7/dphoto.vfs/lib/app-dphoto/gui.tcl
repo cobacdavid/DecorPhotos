@@ -34,10 +34,18 @@ label  $f.lc -text "Couleur du texte"
 label  $f.lcc -relief ridge -borderwidth 3 -bg $(user:couleur)\
     -text "Cliquer pour choisir la couleur"
 bind   $f.lcc <1> [list callback:choixCoul $f.lcc]
-label  $f.lp -text "Fichier TTF de police"
-entry  $f.ep 
-button $f.bp -text ... -command [list callback:choixPol $f.ep]
-affValeurEntry $f.ep $(user:fPolice)
+
+# label  $f.lp -text "Fichier TTF de police"
+# entry  $f.ep 
+# button $f.bp -text ... -command [list callback:choixPol $f.ep]
+# affValeurEntry $f.ep $(user:fPolice)
+label  $f.lp -text "Police du texte"
+menubutton $f.ep -menu $f.ep.m -textvar (user:fPolice) -relief groove
+menu $f.ep.m -tearoff 0
+foreach gendarme [magick fonts] {
+    $f.ep.m add command -label $gendarme -command [list set (user:fPolice) $gendarme]
+}
+
 label $f.ltp -text "Taille de police"
 entry $f.etp
 affValeurEntry $f.etp $(user:tPolice)
@@ -79,7 +87,7 @@ incr row
 
 grid $f.lp -row $row -column 1
 grid $f.ep -row $row -column 2 -sticky news
-grid $f.bp -row $row -column 3
+#grid $f.bp -row $row -column 3
 incr row
 
 grid $f.ltp -row $row -column 1
@@ -95,7 +103,7 @@ set h .h
 
 labelframe $h -text "Visualisation sur un exemple"
 button $h.b -text "Test sur une des photos du r\u00e9pertoire"\
-    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.ep $f.etp $h.b 1]
+    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $h.b 1]
 set format [expr {4/3.}]
 set L 600
 set l [expr {int($L/$format)}]
@@ -123,7 +131,7 @@ set g .g
 labelframe $g -text "Traitement g\u00e9n\u00e9ral"
 
 button $g.ok   -text "Traitement complet" \
-    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.ep $f.etp $g.ok]
+    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $g.ok]
 button $g.def  -text "Config par d\u00e9faut" -command [list callback:defaut]
 button $g.exit  -text Fermer -command [list callback:exit]
 pack $g.ok $g.exit $g.def -side left -fill x -expand 1

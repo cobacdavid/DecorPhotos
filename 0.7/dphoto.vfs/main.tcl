@@ -34,6 +34,7 @@ lappend auto_path [file join $::topdir lib]
 set dLibDP [file join $::topdir lib app-dphoto]
 ## set fDPhoto [file join $dLibDP decPhoto_pixane.tcl]
 set fDPhoto [file join $dLibDP decPhoto_tclmagick.tcl]
+## set fDPhoto "/travail/david/production/info/tcl/DecorPhotos/0.7/dphoto.vfs/lib/app-dphoto/decPhoto_tclmagick.tcl"
 set fGUI    [file join $dLibDP gui.tcl]
 ##s et fThemes [file join $dLibDP themes_pixane.tcl]
 set fThemes [file join $dLibDP themes_tclmagick.tcl]
@@ -43,5 +44,7 @@ source $fThemes
 ###
 package require Tk
 package require jpeg
+package require TclMagick
+package require TkMagick
 #package require AMappedProgressBar
 package require app-dphoto
