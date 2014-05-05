@@ -1,17 +1,13 @@
 package provide app-dphoto 1.0
 
-#!/bin/sh
-# -*-Tcl-*-
-# The next line restarts using tclsh \
-exec etcl "$0" -- ${1+"$@"}
-
-
 # auteur : david cobac [string map {# @} david.cobac#gmail.com]
 # date   : 29/04/2010
-# rev    : 14/05/2010
+# rev    : 05/05/2014
 
-###
+# fake namespaces as this was not meant to be published...
+# version 1.0 will need to fix this !
 
+# utilisé pour attribuer à la variable 'user' les valeurs par défaut
 proc config:copie {} {
     global {}
 
@@ -20,6 +16,7 @@ proc config:copie {} {
     }
 }
 
+# utilisé pour revenir aux valeurs par défaut
 proc config:defaut {} {
     global {}
 
@@ -29,6 +26,7 @@ proc config:defaut {} {
     }
 }
 
+# lecture du fichier de configuration
 proc config:lecture {} {
     global {}
     
@@ -37,6 +35,7 @@ proc config:lecture {} {
     }
 }
 
+# enregistrement des valeurs de la variable 'user'
 proc config:enregistrement {} {
     global {}
     
@@ -47,8 +46,10 @@ proc config:enregistrement {} {
     close $h
 }
 
+##
+##
 
-###
+# callback gui 
 proc callback:choixRep {wentry v} {
     global {}
     
@@ -60,11 +61,13 @@ proc callback:choixRep {wentry v} {
     }
 }
 
+# callback gui
 proc callback:choixRepS {wentry} {
     global {}
     set (user:dOut) [$wentry get]
 }
 
+# callback gui
 proc callback:choixLog {wentry} {
     global r {}
 
@@ -79,6 +82,7 @@ proc callback:choixLog {wentry} {
     }
 }
 
+# callback gui
 proc callback:choixCoul {wlabel} {
     global {}
     
@@ -89,52 +93,37 @@ proc callback:choixCoul {wlabel} {
     $wlabel configure -bg $(user:couleur)
 }
 
-# proc callback:choixPol {wentry} {
-#     global {}
-
-#     set type {
-# 	{{Fichier ttf} {.ttf}}
-# 	{{Tous les fichiers} {.*}}
-#     }
-#     set p [tk_getOpenFile -initialdir [file dirname $(user:fPolice)] -filetypes $type]
-#     if {$p ne ""} {
-# 	set (user:fPolice) $p
-# 	$wentry delete 0 end
-# 	$wentry insert end $p
-#     }
-# }
-
+# callback gui
+# lance l'application des changements sur une image ou sur une collection
 proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wbutton {test 0}} {
     global {} Theme fDPhoto
     
     set (user:dImages) [$wentryRep get]
-    set (user:fLogo)    [$wentryLog get]
+    set (user:fLogo)   [$wentryLog get]
     set (user:dOut)    [$wentryRepS get]
     set (user:fOut)    [$wentryOut get]
     set (user:lignes)  [$wentryLin get]
-    #set (user:fPolice) [$wentryPol get]
     set (user:tPolice) [$wentryTPol get]
     
     ### vérifications avant traitement
     if {$(user:dImages) eq "" || $(user:fOut) eq ""} {return}
     if {![file exists $(user:dImages)]} {return}
     if {![file exists $(user:fLogo)]} {return}
-    #if {![file exists $(user:fPolice)]} {return}
     ###
     cd $(user:dImages)
     set listeJPG [glob -nocomplain *.jpg]
-    # mode test : une seule image, la première
+    ### mode test : une seule image, la première
     if {$test eq 1} {
 	set listeJPG [lindex $listeJPG 0]
     }
-    #
+    ###
     set nbFic [llength $listeJPG]
     if { $nbFic eq 0} {
 	tk_messageBox -icon info -message "Pas de fichiers jpg trouv\u00e9s.
 V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 	return
     }
-
+    ####
     # si un fichier dphoto.txt existe -> on le prend en compte
     set f [file join $(user:dImages) $(user:dOut) dphoto.txt]
     # on ne le fait pas pour les tests
@@ -142,6 +131,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 	set hf [open $f r]
 	while {![eof $hf]} {
 	    gets $hf ligne
+	    # chaque ligne est  associé à une image et un texte particuliers
 	    if {$ligne ne ""} {
 		regexp {(.*)\t(.*)} $ligne -> f l
 		set inFile $f
@@ -151,22 +141,21 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 	}
 	close $hf
     } else {
-	#set nbFicTraites 0
+	# sans fichier dphoto.txt on applique
+	# le même traitement à toutes les images
 	foreach inFile $listeJPG {
-	    #incr nbFicTraites
-	    #$wbutton configure -text "$nbFicTraites traites sur $nbFic"
-	    #update
 	    source $fDPhoto
 	}
     }
-    #$wbutton configure -text "Traitement complet"
 }
 
+# callback gui
 proc callback:exit {} {
     config:enregistrement
     exit
 }
 
+# callback gui
 proc callback:defaut {} {
     config:defaut
     config:enregistrement
@@ -175,6 +164,7 @@ Veuillez red\u00e9marrer pour prendre en compte l'action."
     exit
 }
 
+# callback gui
 proc callback:theme {wmenubutton n} {
     global {} Theme
 
@@ -182,6 +172,7 @@ proc callback:theme {wmenubutton n} {
     $wmenubutton configure -text [lindex [set Theme($n)] 0]
 }
 
+# callback gui
 proc callback:genF {wEL wES wEPL wETP wEH wLCC wBR wBT wBTC} {
     global {} gui:genF
 
@@ -198,6 +189,7 @@ proc callback:genF {wEL wES wEPL wETP wEH wLCC wBR wBT wBTC} {
     }
 }
 
+#callback gui
 proc callback:genereFicTextes {wentryRep wentryRepS wentryL} {
     global {}
 
@@ -216,6 +208,9 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 
     file mkdir $(user:dOut)
     cd $(user:dOut)
+    # lecture du fichier s'il existe
+    # on récupère les données, on ne les écrasera pas
+    # par l'écriture...
     if {[file exists dphoto.txt]} {
 	set hf [open dphoto.txt r]
 	while {![eof $hf]} {
@@ -227,6 +222,9 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 	}
 	close $hf
     }
+    # écriture du fichier
+    # seules les nouvelles images (si dphoto.txt existait)
+    # prennent le texte de l'interface
     set h [open dphoto.txt w+]
     foreach inFile $listeJPG {
 	if {[info exists fic($inFile)]} {
@@ -239,12 +237,14 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 }
 
 ###
+###
 
+# procédure utilisée ??? à vérifier
 proc verif:existRep {d} {
     return [file isdirectory $d]
 }
 
-###
+# rafraîchissement de l'affichage des entry
 proc affValeurEntry {wentry valeur} {
     global {}
 
@@ -252,6 +252,7 @@ proc affValeurEntry {wentry valeur} {
     $wentry insert end $valeur
 }
 
+# construction du menubutton Thème
 proc nomTheme {wmenubutton} {
     global {} Theme
 
@@ -262,16 +263,14 @@ proc nomTheme {wmenubutton} {
     for {set i 0} {$i<[array size Theme]} {incr i} {
 	$m add command -label "Thème $i : [lindex [set Theme($i)] 0]" -command [list callback:theme $wmenubutton $i]
     }
+    # on sélectionne le premier thème au démarrage
     set (user:choixTheme) 0
     $wmenubutton configure -text [lindex $Theme(0) 0]
 }
 
-
 ##################################################################
 ##################################################################
 
-# set r [file normalize [file dirname [info script]]]
-# set r [file normalize [file join $::etcl::topdir ..]]
 set r [file normalize [file dirname [info nameofexecutable]]]
 set h [file normalize $::env(HOME)]
 # valeurs par défaut
@@ -290,10 +289,10 @@ array set {} "
     fPolice    Courier
     fRc        [file join $h decorphoto.rc]
 "
-
+# on attribue ces valeurs à la variable 'user'
 config:copie
+# on lit les valeurs enregistrées dans le fichier RC
 config:lecture
-
-###
+############
 source $fGUI
-###
+############

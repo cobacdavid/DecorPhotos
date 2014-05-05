@@ -1,6 +1,10 @@
 # auteur : david cobac [string map {# @} david.cobac#free.fr]
 # date   : 18/05/2010
-#
+# rev    : 05/05/2014
+
+# Remarque : joli bazar, à vouloir faire simple
+# j'en suis venu à faire crade :(
+# Faudra que je change tout cela pour la version 1.0 ...
 
 set f .f
 set g .g
