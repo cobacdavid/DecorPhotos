@@ -88,7 +88,7 @@ set hL   [expr {$wL*$hLogo/$wLogo}]
 $logo resize $wL $hL 
 # set minY [expr {$minY - $fa}]
 # exécution du thème choisi
-eval $theme($(user:choixTheme))
+eval [lindex [set Theme($(user:choixTheme))] 1]
 # insertion du dessin dans l'image
 $wand draw $draw
 # sauvegarde 

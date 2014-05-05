@@ -105,7 +105,7 @@ proc callback:choixCoul {wlabel} {
 # }
 
 proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wbutton {test 0}} {
-    global {} theme fDPhoto
+    global {} Theme fDPhoto
     
     set (user:dImages) [$wentryRep get]
     set (user:fLogo)    [$wentryLog get]
@@ -176,10 +176,10 @@ Veuillez red\u00e9marrer pour prendre en compte l'action."
 }
 
 proc callback:theme {wmenubutton n} {
-    global {} docTheme
+    global {} Theme
 
     set (user:choixTheme) $n
-    $wmenubutton configure -text $docTheme($n)    
+    $wmenubutton configure -text [lindex [set Theme($n)] 0]
 }
 
 proc callback:genF {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryPol wlabelPol wbuttonGen} {
@@ -253,17 +253,17 @@ proc affValeurEntry {wentry valeur} {
 }
 
 proc nomTheme {wmenubutton} {
-    global {} docTheme
+    global {} Theme
 
     set m $wmenubutton.m  
     menu $m -tearoff 0
     $wmenubutton configure -menu $m 
 
-    foreach {n t} [array get docTheme] {
-	$m add command -label $t -command [list callback:theme $wmenubutton $n]
+    for {set i 0} {$i<[array size Theme]} {incr i} {
+	$m add command -label [lindex [set Theme($i)] 0] -command [list callback:theme $wmenubutton $i]
     }
-    set (user:choixTheme) $n
-    $wmenubutton configure -text $t
+    set (user:choixTheme) 0
+    $wmenubutton configure -text [lindex $Theme(0) 0]
 }
 
 
