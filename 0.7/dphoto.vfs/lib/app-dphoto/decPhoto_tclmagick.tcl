@@ -74,6 +74,7 @@ $draw textantialias 1
 ## Xoff : dimension d'un caractère de police typiquement $(user:tpolice)
 ## hLigne : hauteur d'une ligne
 set largeurMax 0
+set infoTexte {}
 for {set i 0} {$i<$nbLignes} {incr i} {
     set texte [lindex $lignes $i]
     foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break

@@ -3,16 +3,18 @@
 #
 
 set f .f
+set g .g
+set h .h
 labelframe $f -text Param\u00e8tres
 
 checkbutton $f.r -text "G\u00e9n\u00e9rer le fichier dphoto.txt dans le r\u00e9pertoire\
 de sortie" -variable gui:genF -anchor w \
-    -command [list callback:genF $f.ed $f.el $f.eds $f.es $f.et $f.ep $f.lcc $f.br]
+    -command [list callback:genF $f.el $f.es $f.ep.l $f.etp $f.eh $f.lcc $f.br $h.b $g.ok]
 button $f.br -text "G\u00e9n\u00e9rer" -command [list callback:genereFicTextes $f.ed $f.eds $f.et]\
     -state disabled
 set w 50
 label  $f.ld -text "R\u00e9pertoire des images"
-entry  $f.ed -width $w
+entry  $f.ed -width 50
 affValeurEntry $f.ed $(user:dImages)
 button $f.bd -text ... -command [list callback:choixRep $f.ed (user:dImages)]
 label  $f.ll -text "Chemin vers le logo"
@@ -35,19 +37,23 @@ label  $f.lcc -relief ridge -borderwidth 3 -bg $(user:couleur)\
     -text "Cliquer pour choisir la couleur"
 bind   $f.lcc <1> [list callback:choixCoul $f.lcc]
 
-# label  $f.lp -text "Fichier TTF de police"
-# entry  $f.ep 
-# button $f.bp -text ... -command [list callback:choixPol $f.ep]
-# affValeurEntry $f.ep $(user:fPolice)
 label  $f.lp -text "Police du texte"
-menubutton $f.ep -menu $f.ep.m -textvar (user:fPolice) -relief groove
-menu $f.ep.m -tearoff 0
-foreach gendarme [magick fonts] {
-    $f.ep.m add command -label $gendarme -command [list set (user:fPolice) $gendarme]
-}
+frame $f.ep 
+listbox $f.ep.l -height 5 -width 45
+scrollbar $f.ep.s -orient vertical
+grid $f.ep.l -row 0 -column 0 -sticky news
+grid $f.ep.s -row 0 -column 1 -sticky news
+$f.ep.l configure -yscrollcommand [list $f.ep.s set]
+$f.ep.s configure -command [list $f.ep.l yview]
+set gendarmes  [magick fonts]
+set indice [lsearch -exact $gendarmes $(user:fPolice)]
+eval $f.ep.l insert 0 $gendarmes
+$f.ep.l selection set $indice
+$f.ep.l see $indice
+bind $f.ep.l <<ListboxSelect>> {set (user:fPolice) [$f.ep.l get [$f.ep.l curselection]]}
 
-label $f.ltp -text "Taille de police"
-entry $f.etp
+#label $f.ltp -text "Taille de police"
+entry $f.etp -width 3
 affValeurEntry $f.etp $(user:tPolice)
 label  $f.lh -text Th\u00e8mes
 menubutton  $f.eh -relief ridge
@@ -56,50 +62,48 @@ nomTheme $f.eh
 set row 1
 
 grid $f.r  -row $row -column 1 -columnspan 2 -sticky news
-grid $f.br -row $row -column 3
+grid $f.br -row $row -column 3 -sticky news
 incr row
 
-grid $f.ld -row $row -column 1
-grid $f.ed -row $row -column 2
-grid $f.bd -row $row -column 3
+grid $f.ld -row $row -column 1 -sticky e
+grid $f.ed -row $row -column 2 -sticky news
+grid $f.bd -row $row -column 3 -sticky news
 incr row
 
-grid $f.ll -row $row -column 1
+grid $f.ll -row $row -column 1 -sticky e
 grid $f.el -row $row -column 2 -sticky news
-grid $f.bl -row $row -column 3
+grid $f.bl -row $row -column 3 -sticky news
 incr row
 
-grid $f.lds -row $row -column 1
-grid $f.eds -row $row -column 2  -columnspan 2 -sticky news
+grid $f.lds -row $row -column 1 -sticky e
+grid $f.eds -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
-grid $f.ls -row $row -column 1
+grid $f.ls -row $row -column 1 -sticky e
 grid $f.es -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
-grid $f.lt -row $row -column 1
+grid $f.lt -row $row -column 1 -sticky e
 grid $f.et -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
-grid $f.lc -row $row -column 1
+grid $f.lc -row $row -column 1 -sticky e
 grid $f.lcc -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
-grid $f.lp -row $row -column 1
-grid $f.ep -row $row -column 2 -sticky news
-#grid $f.bp -row $row -column 3
+grid $f.lp -row $row -column 1 -sticky e
+grid $f.ep -row $row -column 2  -sticky news
+grid $f.etp -row $row -column 3  -sticky ew
 incr row
 
-grid $f.ltp -row $row -column 1
-grid $f.etp -row $row -column 2 -sticky news
-incr row
+#grid $f.ltp -row $row -column 1 -sticky e
+#grid $f.etp -row $row -column 2 -sticky news
+#incr row
 
-grid $f.lh -row $row -column 1
+grid $f.lh -row $row -column 1 -sticky e
 grid $f.eh -row $row -column 2  -columnspan 2 -sticky news
 
 ###
-
-set h .h
 
 labelframe $h -text "Visualisation sur un exemple"
 button $h.b -text "Test sur une des photos du r\u00e9pertoire"\
@@ -127,7 +131,6 @@ bind .moi <1> {tk_messageBox -message \
 		   -title information -type ok}
 
 ###
-set g .g
 labelframe $g -text "Traitement g\u00e9n\u00e9ral"
 
 button $g.ok   -text "Traitement complet" \

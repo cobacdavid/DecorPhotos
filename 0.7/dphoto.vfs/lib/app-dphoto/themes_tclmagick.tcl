@@ -89,4 +89,17 @@ set Theme([incr j]) [list {logo en haut à gauche + lignes vert. et horiz. + lig
 				 [expr { $w - $largeurMax - $Xoff - .5*$Xoff}] [expr { $h - $hLigne }] 
 			     $draw line $xmax $ymax $xmax [expr { $ymax - $hLigne * $nbLignes }]
 			 }]
+
+set Theme([incr j]) [list {Encadrement simple} \
+			 {
+			     $draw strokewidth $(user:tLine)
+			     $draw strokecolor $userBg
+			     $draw line $Xoff $Xoff $Xoff [expr { $h - $Xoff}]
+			     $draw line $Xoff [expr { $h - $Xoff}]\
+				 [expr { $w - $Xoff}] [expr { $h - $Xoff }]
+			     $draw line [expr { $w - $Xoff}] [expr { $h - $Xoff }]\
+				 [expr { $w - $Xoff}] $Xoff
+			     $draw line [expr { $w - $Xoff}] $Xoff\
+				 $Xoff $Xoff
+			 }]
 ##

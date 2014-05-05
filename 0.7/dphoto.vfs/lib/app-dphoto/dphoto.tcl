@@ -182,19 +182,19 @@ proc callback:theme {wmenubutton n} {
     $wmenubutton configure -text [lindex [set Theme($n)] 0]
 }
 
-proc callback:genF {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryPol wlabelPol wbuttonGen} {
+proc callback:genF {wEL wES wEPL wETP wEH wLCC wBR wBT wBTC} {
     global {} gui:genF
 
     if {${gui:genF} eq 0} {
-	foreach w [list $wentryLog $wentryOut $wentryPol $wlabelPol] {
+	foreach w [list $wEL $wES $wEPL $wETP $wEH $wLCC $wBT $wBTC] {
 	    $w configure -state normal
 	}
-	$wbuttonGen configure -state disabled
+	$wBR configure -state disabled
     } else {
-	foreach w [list $wentryLog $wentryOut $wentryPol $wlabelPol] {
+	foreach w [list $wEL $wES $wEPL $wETP $wEH $wLCC $wBT $wBTC] {
 	    $w configure -state disabled
 	}
-	$wbuttonGen configure -state normal
+	$wBR configure -state normal
     }
 }
 
