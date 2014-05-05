@@ -67,6 +67,26 @@ $draw fontsize $(user:tPolice)
 $draw strokecolor $userFg
 $draw fillcolor   $userBg
 $draw textantialias 1
+### Calculs des distances pour le texte
+## infoTexte { {{ligne0 à insérer} largeur} {{ligne1 à insérer} largeur} etc. }
+## variables globales :
+## largeurMax : largeur maximale
+## Xoff : dimension d'un caractère de police typiquement $(user:tpolice)
+## hLigne : hauteur d'une ligne
+set largeurMax 0
+for {set i 0} {$i<$nbLignes} {incr i} {
+    set texte [lindex $lignes $i]
+    foreach { cw ch fa fd fw fh ha } [$wand queryfontmetrics $draw $texte] break
+    set largeurMax [expr {max($largeurMax,$fw)}]
+    set infoTexte [lappend infoTexte [list $texte $fw]]
+}
+set Xoff $cw
+set hLigne [expr {$fa-$fd}]
+# dimension logo
+set wL   $(user:tLogo)
+set hL   [expr {$wL*$hLogo/$wLogo}]
+$logo resize $wL $hL 
+# set minY [expr {$minY - $fa}]
 # exécution du thème choisi
 eval $theme($(user:choixTheme))
 # insertion du dessin dans l'image
