@@ -5,6 +5,10 @@
 ##
 set j -1
 #
+set Theme([incr j]) [list {Noir et Blanc} \
+			 {
+			     $wand imagetype grayscale
+			 }]
 set Theme([incr j]) [list {lignes de textes seules en haut à gauche} \
 			 {
 			     for {set i 0} {$i<$nbLignes} {incr i} {
@@ -102,4 +106,5 @@ set Theme([incr j]) [list {Encadrement simple} \
 			     $draw line [expr { $w - $Xoff}] $Xoff\
 				 $Xoff $Xoff
 			 }]
+
 ##

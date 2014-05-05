@@ -260,7 +260,7 @@ proc nomTheme {wmenubutton} {
     $wmenubutton configure -menu $m 
 
     for {set i 0} {$i<[array size Theme]} {incr i} {
-	$m add command -label [lindex [set Theme($i)] 0] -command [list callback:theme $wmenubutton $i]
+	$m add command -label "Thème $i : [lindex [set Theme($i)] 0]" -command [list callback:theme $wmenubutton $i]
     }
     set (user:choixTheme) 0
     $wmenubutton configure -text [lindex $Theme(0) 0]
@@ -279,7 +279,7 @@ array set {} "
     couleur    white
     couleurf   black
     choixTheme 0
-    lignes     {le \$date \u00e0 \$heure\\nAngers}
+    lignes     {le \$date \u00e0 \$heure\\n\u00a9 http://github.com/cobdav}
     dImages    $r
     dOut       dphoto
     tLogo      200
