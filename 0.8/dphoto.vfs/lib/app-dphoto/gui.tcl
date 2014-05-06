@@ -39,11 +39,15 @@ affValeurEntry $f.et $(user:lignes)
 label  $f.lc -text "Couleur du texte"
 label  $f.lcc -relief ridge -borderwidth 3 -bg $(user:couleur)\
     -text "Cliquer pour choisir la couleur"
-bind   $f.lcc <1> [list callback:choixCoul $f.lcc]
+bind   $f.lcc <1> [list callback:choixCoul $f.lcc (user:couleur)]
+label  $f.lde -text "Couleur du détourage"
+label  $f.ldec -relief ridge -borderwidth 3 -bg $(user:couleurf)\
+    -text "Cliquer pour choisir la couleur"
+bind   $f.ldec <1> [list callback:choixCoul $f.ldec (user:couleurf)]
 
 label  $f.lp -text "Police du texte"
 frame $f.ep 
-listbox $f.ep.l -height 5 -width 45
+listbox $f.ep.l -height 5 -width 45 -exportselection 0
 scrollbar $f.ep.s -orient vertical
 grid $f.ep.l -row 0 -column 0 -sticky news
 grid $f.ep.s -row 0 -column 1 -sticky news
@@ -100,6 +104,10 @@ grid $f.lc -row $row -column 1 -sticky e
 grid $f.lcc -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
+grid $f.lde -row $row -column 1 -sticky e
+grid $f.ldec -row $row -column 2 -columnspan 2 -sticky news
+incr row
+
 grid $f.lp -row $row -column 1 -sticky e
 grid $f.ep -row $row -column 2  -sticky news
 grid $f.etp -row $row -column 3  -sticky ew
@@ -109,7 +117,7 @@ grid $f.lh -row $row -column 1 -sticky e
 grid $f.eh -row $row -column 2  -columnspan 2 -sticky news
 incr row
 
-grid $f.lm -row $row -column 1  -columnspan 2 -sticky news
+grid $f.lm -row $row -column 2  -sticky news
 grid $f.em -row $row -column 3  -sticky news
 ###
 

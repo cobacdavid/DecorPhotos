@@ -30,6 +30,8 @@ foreach {k v} [jpeg::formatExif [jpeg::getExif $inFile]] {
 		    ([0-9]+):([0-9]+):([0-9]+)} $v -> y m d H M S
 	set date  "$d/$m/$y"
 	set heure ${H}:${M}:${S}
+	# l'option locale n'est pas forcément prise ne compte
+	# cela dépend de la version de Tcl
 	set mois [clock format [clock scan "$y$m$d $heure"]\
 		      -format %B -locale fr]
 	set Mois [string toupper $mois 0 0]
@@ -67,13 +69,14 @@ set h     [$wand height]
 set wLogo [$logo width]
 set hLogo [$logo height]
 # 
-set lignes [split [subst $(user:lignes)] \n]
+set lignes   [split [subst $(user:lignes)] \n]
 set nbLignes [llength $lignes]
-set minX $w
-set minY $h
+set minX     $w
+set minY     $h
 # on installe la police utilisée dans la zone de dessin
 $draw font          $police
 $draw fontsize      $(user:tPolice)
+$draw strokewidth   $(user:tLine)
 $draw strokecolor   $userFg
 $draw fillcolor     $userBg
 $draw textantialias 1

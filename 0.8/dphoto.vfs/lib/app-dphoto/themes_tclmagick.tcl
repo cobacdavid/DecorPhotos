@@ -65,18 +65,24 @@ set Theme([incr j]) [list {lignes de textes seules centrées en bas } \
 			     }
 			 }]
 
-set Theme([incr j]) [list {logo seul en haut à gauche + lignes de textes} \
+set Theme([incr j]) [list {logo seul en haut à gauche} \
 			 {
-			     for {set i 0} {$i<$nbLignes} {incr i} {
-				 set t  [lindex $infoTexte $i]
-				 set laLigne  [lindex $t 0]
-				 set x0 [expr { $w - $Xoff - [lindex $t 1] }]
-				 set y0 [expr { $h - ($nbLignes - $i) * $hLigne }]
-				 $draw annotation [expr {$x0+2}] [expr {$y0-2}] $laLigne
-				 $draw annotation $x0 $y0 $laLigne
-			     }
-			     # insertion logo
 			     $wand composite $logo over [expr {int($fa)}] [expr {int($fa)}]
+			 }]
+
+set Theme([incr j]) [list {logo seul en haut à droite} \
+			 {
+			     $wand composite $logo over [expr { $w - $wL - int($fa) }] [expr {int($fa)}]
+			 }]
+
+set Theme([incr j]) [list {logo seul en bas à gauche} \
+			 {
+			     $wand composite $logo over [expr { int($fa) }] [expr { $h - $hL - int($fa) }]
+			 }]
+
+set Theme([incr j]) [list {logo seul en bas à droite} \
+			 {
+			     $wand composite $logo over [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
 			 }]
 
 set Theme([incr j]) [list {logo en haut à gauche + lignes vert. et horiz. + lignes de textes} \

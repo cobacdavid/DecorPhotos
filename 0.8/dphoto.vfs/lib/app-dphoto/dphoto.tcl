@@ -76,12 +76,13 @@ proc callback:choixRepS {wentry} {
 
 # callback gui
 proc callback:choixLog {wentry} {
-    global r {}
+    global {}
 
     set type {
-	{{Fichier jpg} {.jpg}} {{Tous les fichiers} {.*}}
+	{{Fichier jpg} {.jpg}} {{Fichier png} {.png}} {{Tous les fichiers} {.*}}
     }
-    set f [tk_getOpenFile -initialdir $r -filetypes $type]
+    set dir [file normalize [file dirname $(user:fLogo)]]
+    set f [tk_getOpenFile -initialdir $dir -filetypes $type]
     if {[file exists $f]} {
 	$wentry delete 0 end
 	$wentry insert end $f
@@ -90,14 +91,14 @@ proc callback:choixLog {wentry} {
 }
 
 # callback gui
-proc callback:choixCoul {wlabel} {
+proc callback:choixCoul {wlabel var} {
     global {}
     
-    set c [tk_chooseColor -initialcolor $(user:couleur)]
+    set c [tk_chooseColor -initialcolor [set $var]]
     if {$c ne ""} {
-	set (user:couleur) $c
+	set $var $c
     }
-    $wlabel configure -bg $(user:couleur)
+    $wlabel configure -bg [set $var]
 }
 
 # callback gui
