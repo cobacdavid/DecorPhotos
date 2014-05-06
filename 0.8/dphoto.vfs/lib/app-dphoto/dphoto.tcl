@@ -7,6 +7,13 @@ package provide app-dphoto 1.0
 # fake namespaces as this was not meant to be published...
 # version 1.0 will need to fix this !
 
+# utilisé pour centrer la photo sur le canvas
+proc canvas:centrage {wCV hCV wWand hWand} {
+    set x [expr { ($wCV - $wWand ) / 2}]
+    set y [expr { ($hCV - $hWand ) / 2}]
+    return [list $x $y]
+}
+
 # utilisé pour attribuer à la variable 'user' les valeurs par défaut
 proc config:copie {} {
     global {}
@@ -95,8 +102,8 @@ proc callback:choixCoul {wlabel} {
 
 # callback gui
 # lance l'application des changements sur une image ou sur une collection
-proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wbutton {test 0}} {
-    global {} Theme fDPhoto
+proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wentryMTh wbutton {test 0}} {
+    global {} Theme fDPhoto gui:multiThemes
     
     set (user:dImages) [$wentryRep get]
     set (user:fLogo)   [$wentryLog get]
@@ -104,6 +111,7 @@ proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPo
     set (user:fOut)    [$wentryOut get]
     set (user:lignes)  [$wentryLin get]
     set (user:tPolice) [$wentryTPol get]
+    set (user:multiT)  [$wentryMTh get]
     
     ### vérifications avant traitement
     if {$(user:dImages) eq "" || $(user:fOut) eq ""} {return}
@@ -288,6 +296,7 @@ array set {} "
     fLogo      [file join $r logo.jpg]
     fPolice    Courier
     fRc        [file join $h decorphoto.rc]
+    multiT     {}
 "
 # on attribue ces valeurs à la variable 'user'
 config:copie

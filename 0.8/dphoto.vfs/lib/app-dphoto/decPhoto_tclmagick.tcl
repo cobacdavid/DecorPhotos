@@ -100,7 +100,13 @@ set wL   $(user:tLogo)
 set hL   [expr {$wL*$hLogo/$wLogo}]
 $logo resize $wL $hL 
 # exécution du thème choisi
-eval [lindex [set Theme($(user:choixTheme))] 1]
+if {${gui:multiThemes} == 1 } {
+    foreach t $(user:multiT) {
+	eval [lindex [set Theme($t)] 1]
+    }
+} else {
+    eval [lindex [set Theme($(user:choixTheme))] 1]
+}
 # insertion du dessin dans l'image
 $wand draw $draw
 # sauvegarde 
@@ -109,14 +115,27 @@ if {$test eq 0} {
     eval $wand write [file join $(user:dOut) $(user:fOut)]
 } else {
     # affichage dans le canvas
-    # beaucoup plus simple qu'avec pixane !
     set canvas .h.c
-    set wcv [$canvas cget -width]
-    set hcv [$canvas cget -height]
+    $canvas delete all
+    set wcv [winfo width $canvas]
+    set hcv [winfo height $canvas]
     set cv [image create photo]
-    $wand resize $wcv $hcv
-    magicktophoto $wand $cv    
-    .h.c create image 0 0 -image $cv -anchor nw
+    #
+    set rapportWand [expr {1. * $w / $h}]
+    set rapportCV   [expr {1. * $wcv / $hcv}]
+    if {$rapportWand > $rapportCV} {
+	set rapport [expr {1. * $wcv / $w}]
+	set ww $wcv
+	set hw [expr {int($h * $rapport)}]
+    } else {
+	set rapport [expr {1. * $hcv / $h}]
+	set ww [expr {int($w * $rapport)}]
+	set hw $hcv
+    }
+    $wand resize $ww $hw
+    #
+    magicktophoto $wand $cv 
+    eval .h.c create image [canvas:centrage $wcv $hcv $ww $hw] -image $cv -anchor nw
 }
 # nettoyage
 magick delete $draw

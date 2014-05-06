@@ -17,7 +17,7 @@ old_library='libTkMagick.a'
 inherited_linker_flags=' -fopenmp -pthread'
 
 # Libraries that this one depends upon.
-dependency_libs=' /usr/lib/x86_64-linux-gnu/libfreetype.la -lX11 -lXss -lXext -lXft -lfontconfig -ldl -lpthread -lieee -lm /usr/lib/x86_64-linux-gnu/libMagickWand.la /usr/lib/x86_64-linux-gnu/libMagickCore.la'
+dependency_libs=' /usr/lib/x86_64-linux-gnu/libfreetype.la -lX11 -lXss -lXext -lXft -lfontconfig -ldl -lz -lpthread -lieee -lm /usr/lib/x86_64-linux-gnu/libMagickWand.la /usr/lib/x86_64-linux-gnu/libMagickCore.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

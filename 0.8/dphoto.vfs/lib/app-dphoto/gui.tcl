@@ -59,10 +59,15 @@ bind $f.ep.l <<ListboxSelect>> {set (user:fPolice) [$f.ep.l get [$f.ep.l cursele
 #label $f.ltp -text "Taille de police"
 entry $f.etp -width 3
 affValeurEntry $f.etp $(user:tPolice)
+# Thèmes
 label  $f.lh -text Th\u00e8mes
 menubutton  $f.eh -relief ridge
 nomTheme $f.eh
 
+checkbutton $f.lm -text "Appliquer plusieurs thèmes (ex : 1 3 4)"\
+    -variable gui:multiThemes -anchor w
+entry $f.em
+affValeurEntry $f.em $(user:multiT)
 set row 1
 
 grid $f.r  -row $row -column 1 -columnspan 2 -sticky news
@@ -100,25 +105,26 @@ grid $f.ep -row $row -column 2  -sticky news
 grid $f.etp -row $row -column 3  -sticky ew
 incr row
 
-#grid $f.ltp -row $row -column 1 -sticky e
-#grid $f.etp -row $row -column 2 -sticky news
-#incr row
-
 grid $f.lh -row $row -column 1 -sticky e
 grid $f.eh -row $row -column 2  -columnspan 2 -sticky news
+incr row
 
+grid $f.lm -row $row -column 1  -columnspan 2 -sticky news
+grid $f.em -row $row -column 3  -sticky news
 ###
 
 labelframe $h -text "Visualisation sur un exemple"
 button $h.b -text "Test sur une des photos du r\u00e9pertoire"\
-    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $h.b 1]
-set format [expr {4/3.}]
+    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $f.em $h.b 1]
+#set format [expr {4/3.}]
 set L 600
-set l [expr {int($L/$format)}]
-canvas $h.c -width $L -height $l -relief ridge
+#set l [expr {int($L/$format)}]
+canvas $h.c -width $L -height $L -relief ridge -bg white
+#bind $h.c <Configure> { actualisecv %W %w %h}
+
 
 pack $h.b -fill x
-pack $h.c
+pack $h.c -fill both
 
 ###
 canvas .moi  -relief groove -width 20 -height 30
@@ -138,7 +144,7 @@ bind .moi <1> {tk_messageBox -message \
 labelframe $g -text "Traitement g\u00e9n\u00e9ral"
 
 button $g.ok   -text "Traitement complet" \
-    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $g.ok]
+    -command [list callback:okay $f.ed $f.el $f.eds $f.es $f.et $f.etp $f.em $g.ok]
 button $g.def  -text "Config par d\u00e9faut" -command [list callback:defaut]
 button $g.exit  -text Fermer -command [list callback:exit]
 pack $g.ok $g.exit $g.def -side left -fill x -expand 1

@@ -1,6 +1,9 @@
 # auteur : david cobac [string map {# @} david.cobac#free.fr]
 # date   : 18/05/2010 -- 05/05/2014
 
+# TclMagick compilé avec : ubuntu 14.04 amd64 / tcl et tk 8.5
+# tclkit : tclkit-linux-x86_64 (tclkit 8.5b1)
+
 # obligation du starkit
 package require starkit
 starkit::startup

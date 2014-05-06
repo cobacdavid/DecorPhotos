@@ -1,14 +1,10 @@
 #
-# utilisation de j et incrj pour éviter tout classement hardcodé
+# utilisation de j et incr j pour éviter tout classement hardcodé
 # ici il suffit de couper/coller les thèmes pour changer l'ordre
 #
 ##
 set j -1
 #
-set Theme([incr j]) [list {Noir et Blanc} \
-			 {
-			     $wand imagetype grayscale
-			 }]
 set Theme([incr j]) [list {lignes de textes seules en haut à gauche} \
 			 {
 			     for {set i 0} {$i<$nbLignes} {incr i} {
@@ -57,6 +53,18 @@ set Theme([incr j]) [list {lignes de textes seules en bas à droite} \
 			     }
 			 }]
 
+set Theme([incr j]) [list {lignes de textes seules centrées en bas } \
+			 {
+			     for {set i 0} {$i<$nbLignes} {incr i} {
+				 set t  [lindex $infoTexte $i]
+				 set laLigne  [lindex $t 0]
+				 set x0 [expr { ($w  - [lindex $t 1]) / 2 }]
+				 set y0 [expr { $h - ($nbLignes - $i) * $hLigne }]
+				 $draw annotation [expr {$x0+2}] [expr {$y0-2}] $laLigne
+				 $draw annotation $x0 $y0 $laLigne
+			     }
+			 }]
+
 set Theme([incr j]) [list {logo seul en haut à gauche + lignes de textes} \
 			 {
 			     for {set i 0} {$i<$nbLignes} {incr i} {
@@ -98,13 +106,19 @@ set Theme([incr j]) [list {Encadrement simple} \
 			 {
 			     $draw strokewidth $(user:tLine)
 			     $draw strokecolor $userBg
-			     $draw line $Xoff $Xoff $Xoff [expr { $h - $Xoff}]
-			     $draw line $Xoff [expr { $h - $Xoff}]\
-				 [expr { $w - $Xoff}] [expr { $h - $Xoff }]
-			     $draw line [expr { $w - $Xoff}] [expr { $h - $Xoff }]\
-				 [expr { $w - $Xoff}] $Xoff
-			     $draw line [expr { $w - $Xoff}] $Xoff\
-				 $Xoff $Xoff
+			     set theme_Xoff [expr { 0.5 * $Xoff }]
+			     $draw line $theme_Xoff $theme_Xoff $theme_Xoff [expr { $h - $theme_Xoff}]
+			     $draw line $theme_Xoff [expr { $h - $theme_Xoff}]\
+				 [expr { $w - $theme_Xoff}] [expr { $h - $theme_Xoff }]
+			     $draw line [expr { $w - $theme_Xoff}] [expr { $h - $theme_Xoff }]\
+				 [expr { $w - $theme_Xoff}] $theme_Xoff
+			     $draw line [expr { $w - $theme_Xoff}] $theme_Xoff\
+				 $theme_Xoff $theme_Xoff
+			 }]
+
+set Theme([incr j]) [list {Noir et Blanc} \
+			 {
+			     $wand imagetype grayscale
 			 }]
 
 ##
