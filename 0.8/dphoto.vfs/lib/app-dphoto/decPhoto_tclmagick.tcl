@@ -17,51 +17,9 @@ set police $(user:fPolice)
 $wand ReadImage $inFile
 # chargement du logo
 $logo ReadImage $(user:fLogo)
-# récupération des infos de l'image
-foreach {k v} [jpeg::formatExif [jpeg::getExif $inFile]] {
-    # on récupère tout de toutes façons...pour l'avoir et
-    # pour éventuellement l'utiliser dans le texte !!
-    # Il faudrait penser pouvoir récupérer tout cela
-    # dans l'interface graphique
-    set exif($k) $v
-    # priorité : on récupère date et heure
-    if {$k eq "DateTimeOriginal"} {
-	regexp {([0-9]{4}):([0-9]+):([0-9]+)\
-		    ([0-9]+):([0-9]+):([0-9]+)} $v -> y m d H M S
-	set date  "$d/$m/$y"
-	set heure ${H}:${M}:${S}
-	# l'option locale n'est pas forcément prise ne compte
-	# cela dépend de la version de Tcl
-	set mois [clock format [clock scan "$y$m$d $heure"]\
-		      -format %B -locale fr]
-	set Mois [string toupper $mois 0 0]
-	# pour la cohérence des variables
-	# un peu de redondance ne fait pas de mal
-	set exif(date)  $date
-	set exif(mois)  $mois
-	set exif(Mois)  $Mois
-	set exif(heure) $heure
-	# on récupère ensuite l'orientation
-	# pour pouvior la changer
-    } elseif {$k eq "Orientation"} {
-	set normal [string equal $v "normal"]
-	if [string equal $v "90 degrees cw"] {
-	    set angle 90
-	} elseif [string equal $v "90 degrees ccw"] {
-	    set angle -90
-	}
-    } 
-}
-#
-if {![info exists date] || ![info exists heure]} {
-	tk_messageBox -icon error -message "Erreur de récupération\
-de l'heure et/ou de la date
-Plusieurs causes sont possibles..."
-    return
-}
 # rotation si image en portrait
-if {$normal eq 0} {
-    $wand RotateImage $black $angle
+if {$exif(normal) eq 0} {
+    $wand RotateImage $black $exif(angle)
 }
 # les dimensions des images
 set w     [$wand width]

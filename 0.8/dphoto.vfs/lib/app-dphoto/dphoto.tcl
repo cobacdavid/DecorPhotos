@@ -103,17 +103,19 @@ proc callback:choixCoul {wlabel var} {
 
 # callback gui
 # lance l'application des changements sur une image ou sur une collection
-proc callback:okay {wentryRep wentryLog wentryRepS wentryOut wentryLin wentryTPol wentryMTh wbutton {test 0}} {
-    global {} Theme fDPhoto gui:multiThemes
+proc callback:okay {wdImages wfLogo wdOut wfOut wlignes wtPolice wtLine wtLogo wmultiT wbutton {test 0}} {
+    global {} Theme fDPhoto gui:multiThemes exif
     
-    set (user:dImages) [$wentryRep get]
-    set (user:fLogo)   [$wentryLog get]
-    set (user:dOut)    [$wentryRepS get]
-    set (user:fOut)    [$wentryOut get]
-    set (user:lignes)  [$wentryLin get]
-    set (user:tPolice) [$wentryTPol get]
-    set (user:multiT)  [$wentryMTh get]
-    
+    set (user:dImages) [$wdImages get]
+    set (user:fLogo)   [$wfLogo   get]
+    set (user:dOut)    [$wdOut    get]
+    set (user:fOut)    [$wfOut    get]
+    set (user:lignes)  [$wlignes  get]
+    set (user:tPolice) [$wtPolice get]
+    set (user:tLine)   [$wtLine   get]
+    set (user:tLogo)   [$wtLogo   get]
+    set (user:multiT)  [$wmultiT  get]
+
     ### vérifications avant traitement
     if {$(user:dImages) eq "" || $(user:fOut) eq ""} {return}
     if {![file exists $(user:dImages)]} {return}
@@ -145,6 +147,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 		regexp {(.*)\t(.*)} $ligne -> f l
 		set inFile $f
 		set (user:lignes) [string trim $l \{\}]
+		setExifInfo $inFile
 		source $fDPhoto
 	    }
 	}
@@ -153,6 +156,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 	# sans fichier dphoto.txt on applique
 	# le même traitement à toutes les images
 	foreach inFile $listeJPG {
+	    setExifInfo $inFile
 	    source $fDPhoto
 	}
     }
@@ -182,19 +186,19 @@ proc callback:theme {wmenubutton n} {
 }
 
 # callback gui
-proc callback:genF {wEL wES wEPL wETP wEH wLCC wBR wBT wBTC} {
+proc callback:genF {wB args} {
     global {} gui:genF
 
     if {${gui:genF} eq 0} {
-	foreach w [list $wEL $wES $wEPL $wETP $wEH $wLCC $wBT $wBTC] {
+	foreach w $args {
 	    $w configure -state normal
 	}
-	$wBR configure -state disabled
+	$wB configure -state disabled
     } else {
-	foreach w [list $wEL $wES $wEPL $wETP $wEH $wLCC $wBT $wBTC] {
+	foreach w $args {
 	    $w configure -state disabled
 	}
-	$wBR configure -state normal
+	$wB configure -state normal
     }
 }
 
@@ -273,8 +277,53 @@ proc nomTheme {wmenubutton} {
 	$m add command -label "Thème $i : [lindex [set Theme($i)] 0]" -command [list callback:theme $wmenubutton $i]
     }
     # on sélectionne le premier thème au démarrage
-    set (user:choixTheme) 0
-    $wmenubutton configure -text [lindex $Theme(0) 0]
+    $wmenubutton configure -text [lindex $Theme($(user:choixTheme)) 0]
+}
+
+proc nommodeLogo {wmenubutton} {
+    global {}
+    set m $wmenubutton.m  
+    menu $m -tearoff 0
+    $wmenubutton configure -menu $m 
+    set modes [list "undefined"  "over"  "in"  "out"  "atop"  "xor"  "plus"  "minus"  "add"  "subtract"  "difference"  "multiply"  "bumpmap"  "copy"  "copyred"  "copygreen"  "copyblue"  "copyopacity"  "clear"  "dissolve"  "displace"  "modulate"  "threshold"  "no"  "darken"  "lighten"  "hue"  "saturate"  "colorize"  "luminize"  "screen"  "overlay"  "copycyan"  "copymagenta"  "copyyellow"  "copyblack"  "replace"]
+    
+    foreach mode $modes {
+	$m add command -label $mode -command "$wmenubutton configure -text $mode;set (user:modeLogo) $mode"
+    }
+    # on sélectionne le premier thème au démarrage
+    $wmenubutton configure -text $(user:modeLogo)
+}
+
+proc setExifInfo {f} {
+    global exif
+    foreach {k v} [jpeg::formatExif [jpeg::getExif $f]] {
+	# on récupère tout de toutes façons...pour l'avoir et
+	# pour éventuellement l'utiliser dans le texte !!
+	# Il faudrait penser pouvoir récupérer tout cela
+	# dans l'interface graphique
+	set exif($k) $v
+	# priorité : on récupère date et heure
+	if {$k eq "DateTimeOriginal"} {
+	    regexp {([0-9]{4}):([0-9]+):([0-9]+)\
+			([0-9]+):([0-9]+):([0-9]+)} $v -> y m d H M S
+	    set exif(date)  "$d/$m/$y"
+	    set exif(heure) ${H}:${M}:${S}
+	    # l'option locale n'est pas forcément prise ne compte
+	    # cela dépend de la version de Tcl
+	    set exif(mois) [clock format [clock scan "$y$m$d $exif(heure)"]\
+				-format %B -locale fr]
+	    set exif(Mois) [string toupper $exif(mois) 0 0]
+	    # on récupère ensuite l'orientation
+	    # pour pouvior la changer
+	} elseif {$k eq "Orientation"} {
+	    set exif(normal) [string equal $v "normal"]
+	    if [string equal $v "90 degrees cw"] {
+		set exif(angle) 90
+	    } elseif [string equal $v "90 degrees ccw"] {
+		set exif(angle) -90
+	    }
+	}
+    }
 }
 
 ##################################################################
@@ -287,17 +336,18 @@ array set {} "
     couleur    white
     couleurf   black
     choixTheme 0
-    lignes     {le \$date \u00e0 \$heure\\n\u00a9 http://github.com/cobdav}
+    lignes     {le \$exif(date) \u00e0 \$exif(heure)\\n\u00a9 http://github.com/cobacdavid}
     dImages    $r
     dOut       dphoto
     tLogo      200
-    tLine      6
-    tPolice    60
+    tLine      2
+    tPolice    60*
     fOut       perso_\$inFile
     fLogo      [file join $r logo.jpg]
     fPolice    Courier
     fRc        [file join $h decorphoto.rc]
     multiT     {}
+    modeLogo   over
 "
 # on attribue ces valeurs à la variable 'user'
 config:copie
