@@ -10,6 +10,7 @@ starkit::startup
 set ::topdir [file dirname [info script]]
 lappend auto_path [file join $::topdir lib]
 # les dépendances embarquées
+#package require msgcat
 package require Tk
 package require jpeg
 package require TclMagick

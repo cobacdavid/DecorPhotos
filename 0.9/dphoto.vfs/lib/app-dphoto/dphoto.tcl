@@ -20,6 +20,7 @@ namespace eval dphoto {
     namespace eval config     {}
     namespace eval gui        {
 	variable widgets
+	variable generateDphoto
     }
     namespace eval traitement {
 	variable exif
@@ -73,7 +74,8 @@ mode over
 }
    images {
 inpath          $::r
-relativeoutpath perso_\$inFile
+relativeoutpath dphoto
+prefixout       perso_\$inFile
 }
 "
 ##################################################################

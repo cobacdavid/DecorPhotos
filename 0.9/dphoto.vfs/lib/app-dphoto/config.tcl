@@ -1,6 +1,6 @@
 # utilisé pour attribuer à la variable 'user' les valeurs par défaut
 proc dphoto::config::copie {} {
-    variable ::dphoto::userDefaut
+    variable ::dphoto::userDefault
     variable ::dphoto::user
     
     array set ::dphoto::user [array get ::dphoto::userDefault]
@@ -8,7 +8,7 @@ proc dphoto::config::copie {} {
 
 # utilisé pour revenir aux valeurs par défaut
 proc dphoto::config::defaut {} {
-    variable ::dphoto::userDefaut
+    variable ::dphoto::userDefault
     variable ::dphoto::user
     
     array set ::dphoto::userDefault [array get ::dphoto::user]
