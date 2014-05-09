@@ -14,12 +14,12 @@
 # dans ce tableau TOUT est lié à la variable ::dphoto::userDefault !!!
 #
 array set ::dphoto::gui::widgets {
-    fontName {key1 font key2 name parent .font name fN type entry options {}}
+    fontName {key1 font key2 name parent .font name fN type listbox options {-height 5 -width 45 -exportselection 0}}
     fontSize {key1 font key2 size parent .font name fS type entry options {-width 3}}
-    fontFg   {key1 font key2 fg   parent .font name fF type label options {-text "Couleur"}}
-    fontBg   {key1 font key2 bg   parent .font name fB type label options {-text "Couleur fond"}}
-    themeChoice {key1 theme key2 choice parent .theme name tC  type menubutton  options {}}
-    themeMulti  {key1 theme key2 multi  parent .theme name tM  type checkbutton options {}}
+    fontFg   {key1 font key2 fg   parent .font name fF type label options {-relief ridge -borderwidth 3 -text "Couleur"}}
+    fontBg   {key1 font key2 bg   parent .font name fB type label options {-relief ridge -borderwidth 3 -text "Couleur fond"}}
+    themeChoice {key1 theme key2 choice parent .theme name tC  type menubutton  options {-relief ridge}}
+    themeMulti  {key1 theme key2 multi  parent .theme name tM  type checkbutton options {-text "Appliquer plusieurs thèmes (ex : 1 3 4)" -variable ::dphoto::gui::multithemes -anchor w}}
     themeMultiT {key1 theme key2 multiT parent .theme name tMT type entry       options {}}
     lineFg    {key1 line key2 fg    parent .line name lF type label options {}}
     lineBg    {key1 line key2 bg    parent .line name lB type label options {}}
@@ -27,11 +27,11 @@ array set ::dphoto::gui::widgets {
     textLignes {key1 text key2 lignes parent .text name tL type entry options {}}
     logoPath {key1 logo key2 path parent .logo name lP type entry      options {}}
     logoSize {key1 logo key2 size parent .logo name lS type entry      options {-width 3}}
-    logoMode {key1 logo key2 mode parent .logo name lM type menubutton options {}}
+    logoMode {key1 logo key2 mode parent .logo name lM type menubutton options {-relief ridge}}
     imagesInpath          {key1 images key2 path            parent .images name iI type entry options {}}
     imagesRelativeoutpath {key1 images key2 relativeoutpath parent .images name iR type entry options {}}
     imagesPrefixout       {key1 images key2 prefixout       parent .images name iP type entry options {}}
-    generateDphoto {key1 generate key2 dphoto parent .generate name gD type checkbutton options {}}
+    generateDphoto {key1 generate key2 dphoto parent .generate name gD type checkbutton options { -text "G\u00e9n\u00e9rer le fichier dphoto.txt dans le r\u00e9pertoire de sortie" -anchor w -variable ::dphoto::gui::generateDphoto}}
 }
 #
 #
@@ -46,7 +46,7 @@ proc dphoto::gui::centrage {wCV hCV wWand hWand} {
 # w widget entry à compléter
 # namet nom du tableau concerné  FQN
 # namek nom de la clé à modifier
-proc dphoto::gui:setDir {w namet namek} {
+proc dphoto::gui::setDir {w namet namek} {
     variable ::dphoto::user
     
     set dir [tk_chooseDirectory -parent . -title "Choisir le r\u00e9pertoire"]
@@ -79,7 +79,7 @@ proc dphoto::gui::setFile {w namet namek} {
     set type {
 	{{Fichier images} {.jpg .png}} {{Tous les fichiers} {.*}}
     }
-    set dir [file normalize [file dirname [dict get [set $namet] namek]]]
+    set dir [file normalize [file dirname [dict get [set $namet] $namek]]]
     set f [tk_getOpenFile -initialdir $dir -filetypes $type]
     if {[file exists $f]} {
 	$w delete 0 end
@@ -101,27 +101,13 @@ proc dphoto::gui::setCoul {w namet namek} {
     }
 }
 
-# name clé dans la variable ::dphoto::gui::widgets
-# pathparent chemin complet du conteneur
-## le nom complet du widget est renvoyé par la procédure
-## et est stocké dans la variable ::dphoto::gui::widgets
-proc dphoto::gui::creeWidget { name pathparent } {
-    variable ::dphoto::gui::widgets
-
-    set w [dict create {*}$::dphoto::gui::widgets($name)]
-    set path $pathparent.[dict get $w name]
-    eval [dict get $w type] $path [dict get $w options]
-    dict set ::dphoto::gui::widgets($name) path $path
-    return $path
-}
-
 
 # namew nom que porte le widget
 # (derniers caractères après le dernier point)
 proc dphoto::gui::getWidgetPath { namew } {
     variable ::dphoto::gui::widgets
-    
-    return [dict get ::dphoto::gui::widgets($namew) path]
+
+    return [dict get $::dphoto::gui::widgets($namew) path]
 }
 
 # namew nom que porte le widget entry
@@ -150,12 +136,12 @@ proc dphoto::gui::getAllEntries {} {
     dict set ::dphoto::user(images) \
 	relativeoutpath [::dphoto::gui::getEntry imagesRelativeoutpath]
     dict set ::dphoto::user(images) \
-	prefixout       [::dphoto::gui::getEntry imagesPrefixOut]
+	prefixout       [::dphoto::gui::getEntry imagesPrefixout]
     dict set ::dphoto::user(images) \
 	inpath          [::dphoto::gui::getEntry imagesInpath]
     ### vérifications avant traitement
     ### cela reste à compléter !
-    if {[dict get $::dphoto::user(images) path] == "" || \
+    if {[dict get $::dphoto::user(images) inpath] == "" || \
 	    [dict get $::dphoto::user(images) prefixout] == ""}   {return}
     if {![file exists [dict get $::dphoto::user(images) inpath]]} {return}
     if {![file exists [dict get $::dphoto::user(logo)   path  ]]} {return}
@@ -213,17 +199,8 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 }
 
 # callback gui
-proc dphoto::gui::exit {} {
+proc dphoto::gui::fermeture {} {
     ::dphoto::config::enregistrement
-    exit
-}
-
-# callback gui
-proc dphoto::gui::defaut {} {
-    ::dphoto::config::defaut
-    ::dphoto::config::enregistrement
-    tk_messageBox -icon info -message "L'application va se fermer.
-Veuillez red\u00e9marrer pour prendre en compte l'action."
     exit
 }
 
@@ -247,15 +224,16 @@ proc dphoto::gui::nomTheme {w} {
     
     set m $w.m  
     menu $m -tearoff 0
-    $wmenubutton configure -menu $m 
+    $w configure -menu $m 
 
-    for {set i 0} {$i<[array size Theme]} {incr i} {
+    for {set i 0} {$i<[array size ::dphoto::theme]} {incr i} {
 	set texteTheme [lindex $::dphoto::theme($i) 0]
 	$m add command -label "Thème $i : $texteTheme" \
 	    -command [list ::dphoto::gui::theme $w $i]
     }
-    # 
-    $w configure -text [lindex $Theme($(user:choixTheme)) 0]
+    #
+    set indice [dict get $::dphoto::user(theme) choice]
+    $w configure -text [lindex $::dphoto::theme($indice) 0]
 }
 
 # w widget button qui permet de générer le fichier dphoto.txt
@@ -282,7 +260,7 @@ proc dphoto::gui::genereFicTextes {} {
     variable ::dphoto::user
     variable ::dphoto::gui::widgets
 
-    ::dphoto::gui::getAllEntries()
+    ::dphoto::gui::getAllEntries
     cd [dict get $::dphoto::user(images) inpath]
     # à compléter avec des .png    
     set listeJPG [glob -nocomplain *.jpg]
@@ -294,7 +272,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
     #
     #file mkdir $(user:dOut)
     #cd $(user:dOut)
-    cd out [dict get $::dphoto::user(images) relativeoutpath]
+    set out [dict get $::dphoto::user(images) relativeoutpath]
     file mkdir $out
     cd $out
     # lecture du fichier s'il existe
@@ -331,7 +309,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
 ## Normalement w est dict get $::dphoto::gui::widgets(__entry__) path
 proc dphoto::gui::affValeurEntry {w v} {
     $w delete 0 end
-    $w insert end $valeur
+    $w insert end $v
 }
 # w widget menubutton
 ## Normalement w est dict get $::dphoto::gui::widgets(logoMode) path
@@ -386,135 +364,151 @@ proc dphoto::traitement::setExifInfo {f} {
     }
 }
 ######################################################################################""
+# name clé dans la variable ::dphoto::gui::widgets
+# pathparent chemin complet du conteneur
+## le nom complet du widget est renvoyé par la procédure
+## et est stocké dans la variable ::dphoto::gui::widgets
+proc dphoto::gui::creeWidget { name pathparent args} {
+    variable ::dphoto::gui::widgets
 
+    set w [dict create {*}$::dphoto::gui::widgets($name)]
+    set path $pathparent.[dict get $w name]
+    eval [dict get $w type] $path [dict get $w options] $args
+    dict set ::dphoto::gui::widgets($name) path $path
+    return $path
+}
+##
 
 set f .f
 set fT $f.fTexte
 set g .g
 set h .h
+##
 labelframe $f -text Param\u00e8tres
 #
-checkbutton $f.cbgenF -text "G\u00e9n\u00e9rer le fichier dphoto.txt dans le r\u00e9pertoire\
-de sortie" -variable gui:genF -anchor w \
-    -command [list callback:genF $f.bgenF $f.efLogo $f.efOut $fT.lcouleur $fT.lcouleurf $f.mbTheme $h.b $g.ok]
-button $f.bgenF -text "G\u00e9n\u00e9rer" -command [list callback:genereFicTextes $f.edImages $f.edOut $f.elignes]\
-    -state disabled
-set w 50
+dphoto::gui::creeWidget generateDphoto $f -command [list ::dphoto::gui:::genF $f.bgenF]
+button $f.bgenF -text "G\u00e9n\u00e9rer" -command [list dphoto::gui::genereFicTextes] -state disabled
 #
 label  $f.ldImages -text "R\u00e9pertoire des images"
-entry  $f.edImages -width 50
-affValeurEntry $f.edImages $(user:dImages)
-button $f.bdImages -text ... -command [list callback:choixRep $f.edImages (user:dImages)]
+set w [::dphoto::gui::creeWidget imagesInpath $f -width 50]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(images) inpath]
+button $f.bdImages -text ... -command [list ::dphoto::gui::setDir $w ::dphoto::user(images) inpath]
 #
 label  $f.lfLogo -text "Chemin vers le logo"
-entry  $f.efLogo
-affValeurEntry $f.efLogo $(user:fLogo)
-button $f.bfLogo -text ... -command [list callback:choixLog $f.efLogo]
+set w [::dphoto::gui::creeWidget logoPath $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(logo) path]
+button $f.bfLogo -text ... -command [list ::dphoto::gui::setFile $w ::dphoto::user(logo) path]
 #
 label  $f.ldOut -text "Nom du sous-r\u00e9pertoire de sortie"
-entry  $f.edOut
-affValeurEntry $f.edOut $(user:dOut)
-bind   $f.edOut <KeyRelease> [list callback:choixRepS $f.edOut]
+set w [::dphoto::gui::creeWidget imagesRelativeoutpath $f] 
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(images) relativeoutpath]
+bind $w <KeyRelease> [list ::dphoto::gui::setDir $w ::dphoto::user(images) relativeoutpath]
 #
 label  $f.lfOut -text "Nom des fichiers en sortie"
-entry  $f.efOut
-affValeurEntry $f.efOut $(user:fOut)
+set w [::dphoto::gui::creeWidget imagesPrefixout .f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(images) prefixout]
 #
 label  $f.llignes -text "Lignes de texte"
-entry  $f.elignes
-affValeurEntry $f.elignes $(user:lignes)
+set w [::dphoto::gui::creeWidget textLignes $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(text) lignes]
 ##
 label  $f.lTexte -text "Texte"
 frame $fT
-listbox $fT.lbfPolice -height 5 -width 45 -exportselection 0
+set w [::dphoto::gui::creeWidget fontName $fT]
 scrollbar $fT.sbfPolice -orient vertical
-$fT.lbfPolice configure -yscrollcommand [list $fT.sbfPolice set]
-$fT.sbfPolice configure -command [list $fT.lbfPolice yview]
+$w configure -yscrollcommand [list $fT.sbfPolice set]
+$fT.sbfPolice configure -command [list $w yview]
 set gendarmes  [magick fonts]
-set indice [lsearch -exact $gendarmes $(user:fPolice)]
-eval $fT.lbfPolice insert 0 $gendarmes
-$fT.lbfPolice selection set $indice
-$fT.lbfPolice see $indice
-bind $fT.lbfPolice <<ListboxSelect>> {set (user:fPolice) [$fT.lbfPolice get [$fT.lbfPolice curselection]]}
+set indice [lsearch -exact $gendarmes  [dict get $::dphoto::user(font) name]]
+eval $w insert 0 $gendarmes
+$w selection set $indice
+$w see $indice
+bind $w <<ListboxSelect>> {dict set ::dphoto::user(font) name [%W get [%W curselection]]; $f.lTexte configure -font  [%W get [%W curselection]]}
 #
-label  $fT.lcouleur -relief ridge -borderwidth 3 -bg $(user:couleur)\
-    -text "Couleur texte"
-bind   $fT.lcouleur <1> [list callback:choixCoul $fT.lcouleur (user:couleur)]
-label  $fT.lcouleurf -relief ridge -borderwidth 3 -bg $(user:couleurf)\
-    -text "Couleur détourage"
-bind   $fT.lcouleurf <1> [list callback:choixCoul $fT.lcouleurf (user:couleurf)]
-entry $fT.etPolice -width 3
-affValeurEntry $fT.etPolice $(user:tPolice)
-entry $fT.etLine -width 3
-affValeurEntry $fT.etLine $(user:tLine)
-pack $fT.lbfPolice -side left -fill x
+set w [::dphoto::gui::creeWidget fontFg $fT -bg [dict get $::dphoto::user(font) fg]]
+bind $w <1> [list ::dphoto::gui::setCoul $w ::dphoto::user(font) fg]
+#
+set w [::dphoto::gui::creeWidget fontBg $fT -bg [dict get $::dphoto::user(font) bg]]
+bind $w <1> [list ::dphoto::gui::setCoul $w ::dphoto::user(font) bg]
+#
+set w [::dphoto::gui::creeWidget fontSize $fT]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(font) size]
+#
+set w [::dphoto::gui::creeWidget lineWidth $fT]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(line) width]
+pack [dict get $::dphoto::gui::widgets(fontName) path] -side left -fill x
 pack $fT.sbfPolice -side left -fill y
-pack $fT.lcouleur $fT.lcouleurf $fT.etPolice $fT.etLine -fill x
+pack [dict get $::dphoto::gui::widgets(fontFg) path]\
+    [dict get $::dphoto::gui::widgets(fontBg) path]\
+    [dict get $::dphoto::gui::widgets(fontSize) path]\
+    [dict get $::dphoto::gui::widgets(lineWidth) path]\
+    -fill x
 #
 # Thèmes
 label  $f.lTheme -text Th\u00e8mes
-menubutton  $f.mbTheme -relief ridge
-nomTheme $f.mbTheme
+set w [::dphoto::gui::creeWidget themeChoice $f]
+::dphoto::gui::nomTheme $w
 #
 label $f.lmodeLogo -text "Mode Logo"
-menubutton $f.mbmodeLogo -relief ridge
-nommodeLogo $f.mbmodeLogo
-entry      $f.etLogo -width 3
-affValeurEntry $f.etLogo $(user:tLogo)
+set w [::dphoto::gui::creeWidget logoMode $f]
+::dphoto::gui::nommodeLogo $w
 #
-checkbutton $f.cbmultiThemes -text "Appliquer plusieurs thèmes (ex : 1 3 4)"\
-    -variable gui:multiThemes -anchor w
-entry $f.emultiT
-affValeurEntry $f.emultiT $(user:multiT)
+set w [::dphoto::gui::creeWidget logoSize $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(logo) size]
+#
+::dphoto::gui::creeWidget themeMulti $f
+set w [::dphoto::gui::creeWidget themeMultiT $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(theme) multiT]
+##
+##
 set row 1
-##
-##
-grid $f.cbgenF  -row $row -column 1 -columnspan 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(generateDphoto) path] -row $row -column 1 -columnspan 2 -sticky news
 grid $f.bgenF -row $row -column 3 -sticky news
 incr row
 
 grid $f.ldImages -row $row -column 1 -sticky e
-grid $f.edImages -row $row -column 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(imagesInpath) path] -row $row -column 2 -sticky news
 grid $f.bdImages -row $row -column 3 -sticky news
 incr row
 
 grid $f.lfLogo -row $row -column 1 -sticky e
-grid $f.efLogo -row $row -column 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(logoPath) path] -row $row -column 2 -sticky news
 grid $f.bfLogo -row $row -column 3 -sticky news
 incr row
 
 grid $f.ldOut -row $row -column 1 -sticky e
-grid $f.edOut -row $row -column 2 -columnspan 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(imagesRelativeoutpath) path] -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
 grid $f.lfOut -row $row -column 1 -sticky e
-grid $f.efOut -row $row -column 2 -columnspan 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(imagesPrefixout) path] -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
 grid $f.llignes -row $row -column 1 -sticky e
-grid $f.elignes -row $row -column 2 -columnspan 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(textLignes) path] -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
 grid $f.lTexte -row $row -column 1 -sticky e
 grid $f.fTexte -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
-grid $f.cbmultiThemes -row $row -column 2  -sticky w
-grid $f.emultiT       -row $row -column 3  -sticky news
+grid [dict get $::dphoto::gui::widgets(themeMulti)  path] -row $row -column 2  -sticky w
+grid [dict get $::dphoto::gui::widgets(themeMultiT) path] -row $row -column 3  -sticky news
 incr row
 
 grid $f.lTheme  -row $row -column 1 -sticky e
-grid $f.mbTheme -row $row -column 2 -columnspan 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(themeChoice) path] -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
 grid $f.lmodeLogo  -row $row -column 1 -sticky e
-grid $f.mbmodeLogo -row $row -column 2 -sticky news
-grid $f.etLogo     -row $row -column 3 -sticky news
+grid [dict get $::dphoto::gui::widgets(logoMode) path] -row $row -column 2 -sticky news
+grid [dict get $::dphoto::gui::widgets(logoSize) path] -row $row -column 3 -sticky news
+###
 ###
 
 labelframe $h -text "Visualisation sur un exemple"
 button $h.b -text "Test sur une des photos du r\u00e9pertoire"\
-    -command [list callback:okay $f.edImages $f.efLogo $f.edOut $f.efOut $f.elignes $fT.etPolice $fT.etLine $f.etLogo $f.emultiT $h.b 1]
+    -command [list ::dphoto::gui::okay 1]
 #set format [expr {4/3.}]
 set L 600
 #set l [expr {int($L/$format)}]
@@ -543,9 +537,9 @@ bind .moi <1> {tk_messageBox -message \
 labelframe $g -text "Traitement g\u00e9n\u00e9ral"
 
 button $g.ok   -text "Traitement complet" \
-    -command [list callback:okay $f.edImages $f.efLogo $f.edOut $f.efOut $f.elignes $fT.etPolice $fT.etLine $f.etLogo $f.emultiT $h.b]
-button $g.def  -text "Config par d\u00e9faut" -command [list callback:defaut]
-button $g.exit  -text Fermer -command [list callback:exit]
+    -command [list ::dphoto::gui::okay 0]
+button $g.def  -text "Config par d\u00e9faut" -command [list ::dphoto::config::defaut]
+button $g.exit  -text Fermer -command ::dphoto::gui::fermeture
 pack $g.ok $g.exit $g.def -side left -fill x -expand 1
 
 ###
@@ -556,5 +550,5 @@ pack $g  -padx 5 -pady 5  -ipadx 5 -ipady 5 -fill x
 ###
 wm resizable . 0 0
 wm title . "D\u00e9cor de photos"
-bind . <Control-q> [list callback:exit]
-bind . <Control-x> [list callback:exit]
+bind . <Control-q> [list ::dphoto::gui::fermeture]
+bind . <Control-w> [list ::dphoto::gui::fermeture]

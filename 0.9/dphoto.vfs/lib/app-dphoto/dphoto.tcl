@@ -21,6 +21,7 @@ namespace eval dphoto {
     namespace eval gui        {
 	variable widgets
 	variable generateDphoto
+	variable multithemes
     }
     namespace eval traitement {
 	variable exif

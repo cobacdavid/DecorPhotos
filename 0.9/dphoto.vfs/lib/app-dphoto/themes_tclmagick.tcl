@@ -67,27 +67,27 @@ set ::dphoto::theme([incr j]) [list {lignes de textes seules centrées en bas } 
 
 set ::dphoto::theme([incr j]) [list {logo seul en haut à gauche} \
 			 {
-			     $wand composite $logo $(user:modeLogo) [expr {int($fa)}] [expr {int($fa)}]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr {int($fa)}] [expr {int($fa)}]
 			 }]
 
 set ::dphoto::theme([incr j]) [list {logo seul en haut à droite} \
 			 {
-			     $wand composite $logo $(user:modeLogo) [expr { $w - $wL - int($fa) }] [expr {int($fa)}]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr {int($fa)}]
 			 }]
 
 set ::dphoto::theme([incr j]) [list {logo seul en bas à gauche} \
 			 {
-			     $wand composite $logo $(user:modeLogo) [expr { int($fa) }] [expr { $h - $hL - int($fa) }]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { int($fa) }] [expr { $h - $hL - int($fa) }]
 			 }]
 
 set ::dphoto::theme([incr j]) [list {logo seul en bas à droite} \
 			 {
-			     $wand composite $logo $(user:modeLogo) [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
 			 }]
 
 set ::dphoto::theme([incr j]) [list {test composite avec logo} \
 			 {
-			     $wand composite $logo $(user:modeLogo) [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
 			 }]
 set ::dphoto::theme([incr j]) [list {logo en haut à gauche + lignes vert. et horiz. + lignes de textes} \
 			 {
@@ -102,9 +102,9 @@ set ::dphoto::theme([incr j]) [list {logo en haut à gauche + lignes vert. et ho
 			     set ymax [expr { $y0 + abs($fd) }]
 			     set xmax [expr { $w - .5*$Xoff }]
 			     # insertion logo
-			     $wand composite $logo $(user:modeLogo) [expr {int($Xoff)}] [expr {int($Xoff)}]
+			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr {int($Xoff)}] [expr {int($Xoff)}]
 			     # les lignes 
-			     $draw strokewidth $(user:tLine)
+			     $draw strokewidth [dict get $::dphoto::user(line) width]
 			     $draw strokecolor $userBg
 			     $draw line $Xoff [expr {2*$fa + $hL}] $Xoff [expr { $h - $hLigne }]
 			     $draw line $Xoff [expr { $h - $hLigne }] \
@@ -114,7 +114,7 @@ set ::dphoto::theme([incr j]) [list {logo en haut à gauche + lignes vert. et ho
 
 set ::dphoto::theme([incr j]) [list {Encadrement simple} \
 			 {
-			     $draw strokewidth $(user:tLine)
+			     $draw strokewidth [dict get $::dphoto::user(line) width]
 			     $draw strokecolor $userBg
 			     set theme_Xoff [expr { 0.5 * $Xoff }]
 			     $draw line $theme_Xoff $theme_Xoff $theme_Xoff [expr { $h - $theme_Xoff}]

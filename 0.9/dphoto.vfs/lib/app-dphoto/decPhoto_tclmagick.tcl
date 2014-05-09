@@ -7,34 +7,36 @@ set logo  [magick create wand]
 set draw  [magick create draw]
 set pixel [magick create pixel]
 set black [magick create pixel]
-$black color black
 set userFg  [magick create pixel]
-$userFg color $(user:couleurf)
 set userBg  [magick create pixel]
-$userBg color $(user:couleur)
-set police $(user:fPolice)
+$black color black
+$userBg color [dict get $::dphoto::user(font) bg]
+$userFg color [dict get $::dphoto::user(font) fg]
+set police    [dict get $::dphoto::user(font) name]
 # chargement de l'image
 $wand ReadImage $inFile
 # chargement du logo
-$logo ReadImage $(user:fLogo)
+$logo ReadImage [dict get $::dphoto::user(logo) path]
 # rotation si image en portrait
-if {$exif(normal) eq 0} {
-    $wand RotateImage $black $exif(angle)
+if {$::dphoto::traitement::exif(normal) eq 0} {
+    $wand RotateImage $black $::dphoto::traitement::exif(angle)
 }
 # les dimensions des images
 set w     [$wand width]
 set h     [$wand height]
 set wLogo [$logo width]
 set hLogo [$logo height]
-# 
-set lignes   [split [subst $(user:lignes)] \n]
+#
+array set exif [array get ::dphoto::traitement::exif]
+#
+set lignes   [split [subst [dict get $::dphoto::user(text) lignes]] \n]
 set nbLignes [llength $lignes]
 set minX     $w
 set minY     $h
 # on installe la police utilisée dans la zone de dessin
 $draw font          $police
-$draw fontsize      $(user:tPolice)
-$draw strokewidth   $(user:tLine)
+$draw fontsize      [dict get $::dphoto::user(font) size]
+$draw strokewidth   [dict get $::dphoto::user(line) width]
 $draw strokecolor   $userFg
 $draw fillcolor     $userBg
 $draw textantialias 1
@@ -57,23 +59,24 @@ for {set i 0} {$i<$nbLignes} {incr i} {
 set Xoff $cw
 set hLigne [expr {$fa-$fd}]
 # dimensions logo
-set wL   $(user:tLogo)
+set wL   [dict get $::dphoto::user(logo) size]
 set hL   [expr {$wL*$hLogo/$wLogo}]
-$logo resize $wL $hL 
+$logo resize $wL $hL
 # exécution du thème choisi
-if {${gui:multiThemes} == 1 } {
-    foreach t $(user:multiT) {
-	eval [lindex [set Theme($t)] 1]
+if {$::dphoto::gui::multithemes == 1 } {
+    foreach t [dict get $::dphoto::user(theme) multiT] {
+	eval [lindex $::dphoto::theme($t) 1]
     }
 } else {
-    eval [lindex [set Theme($(user:choixTheme))] 1]
+    eval [lindex $::dphoto::theme([dict ge $::dphoto::user(theme) choice]) 1]
 }
 # insertion du dessin dans l'image
 $wand draw $draw
 # sauvegarde 
 if {$test eq 0} {
-    file mkdir $(user:dOut) 
-    eval $wand write [file join $(user:dOut) $(user:fOut)]
+    set out [dict get $::dphoto::user(images) relativeoutpath]
+    file mkdir $out
+    eval $wand write [file join $out [dict get $::dphoto::user(images) prefixout]]
 } else {
     # affichage dans le canvas
     set canvas .h.c
@@ -96,7 +99,7 @@ if {$test eq 0} {
     $wand resize $ww $hw
     #
     magicktophoto $wand $cv 
-    eval .h.c create image [canvas:centrage $wcv $hcv $ww $hw] -image $cv -anchor nw
+    eval .h.c create image [::dphoto::gui::centrage $wcv $hcv $ww $hw] -image $cv -anchor nw
 }
 # nettoyage
 magick delete $draw

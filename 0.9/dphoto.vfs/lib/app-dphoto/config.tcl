@@ -6,14 +6,6 @@ proc dphoto::config::copie {} {
     array set ::dphoto::user [array get ::dphoto::userDefault]
 }
 
-# utilisé pour revenir aux valeurs par défaut
-proc dphoto::config::defaut {} {
-    variable ::dphoto::userDefault
-    variable ::dphoto::user
-    
-    array set ::dphoto::userDefault [array get ::dphoto::user]
-}
-
 # lecture du fichier de configuration
 proc dphoto::config::lecture {} {
     variable ::dphoto::files
@@ -32,4 +24,14 @@ proc dphoto::config::enregistrement {} {
     set    fh [open $::dphoto::files(rc) w+]
     puts  $fh "array set ::dphoto::user [list [array get ::dphoto::user]]"
     close $fh
+}
+
+#
+proc dphoto::config::defaut {} {
+
+    ::dphoto::config::copie
+    ::dphoto::config::enregistrement
+    tk_messageBox -icon info -message "L'application va se fermer.
+Veuillez red\u00e9marrer pour prendre en compte l'action."
+    exit
 }
