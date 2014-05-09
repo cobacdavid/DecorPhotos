@@ -27,7 +27,6 @@ set h     [$wand height]
 set wLogo [$logo width]
 set hLogo [$logo height]
 #
-array set exif [array get ::dphoto::traitement::exif]
 #
 set lignes   [split [subst [dict get $::dphoto::user(text) lignes]] \n]
 set nbLignes [llength $lignes]
@@ -36,7 +35,8 @@ set minY     $h
 # on installe la police utilisée dans la zone de dessin
 $draw font          $police
 $draw fontsize      [dict get $::dphoto::user(font) size]
-$draw strokewidth   [dict get $::dphoto::user(line) width]
+#$draw strokewidth   [dict get $::dphoto::user(line) width]
+$draw strokewidth   1
 $draw strokecolor   $userFg
 $draw fillcolor     $userBg
 $draw textantialias 1

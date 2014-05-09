@@ -362,6 +362,7 @@ proc dphoto::traitement::setExifInfo {f} {
 	    }
 	}
     }
+    array set ::exif [array get ::dphoto::traitement::exif]
 }
 ######################################################################################""
 # name clé dans la variable ::dphoto::gui::widgets
@@ -514,11 +515,10 @@ set L 600
 #set l [expr {int($L/$format)}]
 canvas $h.c -width $L -height $L -relief ridge -bg white
 #bind $h.c <Configure> { actualisecv %W %w %h}
-
-
+focus $h.c
+#
 pack $h.b -fill x
 pack $h.c -fill both
-
 ###
 canvas .moi  -relief groove -width 20 -height 30
 set mafonte {Times 14 bold}
