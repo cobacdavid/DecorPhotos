@@ -23,7 +23,7 @@ list is rather complete, you know...
 # Tools
 
 *DecorPhotos*'s source code uses **Tcl/Tk** with *TclMagick* to
-produce these fantastic image effects :) and [*qrencode*](speedata.github.io/luaqrcode/).
+produce these fantastic image effects :) and [*qrencode*](http://speedata.github.io/luaqrcode/).
 
 No internationalisation is yet provided but... never give up on a dream ;)
 
