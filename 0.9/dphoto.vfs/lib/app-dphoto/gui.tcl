@@ -25,9 +25,11 @@ array set ::dphoto::gui::widgets {
     lineBg    {key1 line key2 bg    parent .line name lB type label options {}}
     lineWidth {key1 line key2 width parent .line name lW type entry options {-width 3}}
     textLignes {key1 text key2 lignes parent .text name tL type entry options {}}
-    logoPath {key1 logo key2 path parent .logo name lP type entry      options {}}
-    logoSize {key1 logo key2 size parent .logo name lS type entry      options {-width 3}}
-    logoMode {key1 logo key2 mode parent .logo name lM type menubutton options {-relief ridge}}
+    logoPath       {key1 logo key2 path        parent .logo name lP  type entry       options {}}
+    logoSize       {key1 logo key2 size        parent .logo name lS  type entry       options {-width 3}}
+    logoMode       {key1 logo key2 mode        parent .logo name lM  type menubutton  options {-relief ridge}}
+    logoQrcode     {key1 logo key2 qrcode      parent .logo name lQ  type checkbutton options {-text "QR code" -anchor w -variable ::dphoto::gui::qrcode}}
+    logoQrcodetext {key1 logo key2 qrcodetext  parent .logo name lQT type entry       options {}}
     imagesInpath          {key1 images key2 path            parent .images name iI type entry options {}}
     imagesRelativeoutpath {key1 images key2 relativeoutpath parent .images name iR type entry options {}}
     imagesPrefixout       {key1 images key2 prefixout       parent .images name iP type entry options {}}
@@ -133,6 +135,8 @@ proc dphoto::gui::getAllEntries {} {
 	size            [::dphoto::gui::getEntry logoSize]
     dict set ::dphoto::user(logo) \
 	path            [::dphoto::gui::getEntry logoPath]
+    dict set ::dphoto::user(logo) \
+	qrcodetext      [::dphoto::gui::getEntry logoQrcodetext]
     dict set ::dphoto::user(images) \
 	relativeoutpath [::dphoto::gui::getEntry imagesRelativeoutpath]
     dict set ::dphoto::user(images) \
@@ -155,7 +159,25 @@ proc dphoto::gui::okay {test} {
 
     ::dphoto::gui::getAllEntries
     ###
-    cd [dict get $::dphoto::user(images) inpath]
+    set rep       [dict get $::dphoto::user(images) inpath]
+    set repsortie [file join $rep [dict get $::dphoto::user(images) relativeoutpath]]
+    file mkdir $repsortie
+    cd $rep
+    # on crée le qrcode
+    # on attribue le qrcode au logo si le checkbutton est coché
+    if {$dphoto::gui::qrcode == 1} {
+	# création du qrcode
+	::luaqrencode::setText [dict get $::dphoto::user(logo) qrcodetext]
+	set qr    [::luaqrencode::qrEncode]
+	set dimqr [::luaqrencode::getDim]
+	# sauvegarde sous forme d'un png
+	set fh [open [file join $repsortie qrcode.xbm] w+]
+	puts $fh [::luaqrencode::qrcode2bitmap]
+	close $fh
+	# attribution comme logo
+	set qrcodepath [file join $repsortie qrcode.xbm]
+	dict set ::dphoto::user(logo) path $qrcodepath
+    }
     # à compléter avec des .png
     set listeJPG [glob -nocomplain *.jpg]
     ### mode test : une seule image, la première
@@ -171,8 +193,7 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
     }
     ####
     # si un fichier dphoto.txt existe -> on le prend en compte
-    set f [file join [dict get $::dphoto::user(images) inpath] \
-	       [dict get $::dphoto::user(images) relativeoutpath] dphoto.txt] 
+    set f [file join $repsortie dphoto.txt]
     # on ne le fait pas pour les tests
     if {[file exists $f] & $test eq 0} {
 	set hf [open $f r]
@@ -330,6 +351,22 @@ proc dphoto::gui::nommodeLogo {w} {
     $w configure -text [dict get $::dphoto::user(logo) mode]
 }
 
+# wLogo widget entry du logo
+# wQrText widget entry du texte du qrcode
+proc  ::dphoto::gui::qrcodeBool {wLogo wQrText} {
+    variable ::dphoto::gui::qrcode
+
+    if $::dphoto::gui::qrcode {
+	$wLogo configure  -state disabled
+	#$wQrText configure -state normal
+    } {
+	$wLogo configure  -state normal
+	#$wQrText configure -state disabled
+    }
+}
+
+
+
 proc dphoto::traitement::setExifInfo {f} {
     variable ::dphoto::traitement::exif
     
@@ -387,18 +424,13 @@ set h .h
 ##
 labelframe $f -text Param\u00e8tres
 #
-dphoto::gui::creeWidget generateDphoto $f -command [list ::dphoto::gui:::genF $f.bgenF]
+dphoto::gui::creeWidget generateDphoto $f -command [list ::dphoto::gui::genF $f.bgenF]
 button $f.bgenF -text "G\u00e9n\u00e9rer" -command [list dphoto::gui::genereFicTextes] -state disabled
 #
 label  $f.ldImages -text "R\u00e9pertoire des images"
 set w [::dphoto::gui::creeWidget imagesInpath $f -width 50]
 ::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(images) inpath]
 button $f.bdImages -text ... -command [list ::dphoto::gui::setDir $w ::dphoto::user(images) inpath]
-#
-label  $f.lfLogo -text "Chemin vers le logo"
-set w [::dphoto::gui::creeWidget logoPath $f]
-::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(logo) path]
-button $f.bfLogo -text ... -command [list ::dphoto::gui::setFile $w ::dphoto::user(logo) path]
 #
 label  $f.ldOut -text "Nom du sous-r\u00e9pertoire de sortie"
 set w [::dphoto::gui::creeWidget imagesRelativeoutpath $f] 
@@ -408,6 +440,15 @@ bind $w <KeyRelease> [list ::dphoto::gui::setDir $w ::dphoto::user(images) relat
 label  $f.lfOut -text "Nom des fichiers en sortie"
 set w [::dphoto::gui::creeWidget imagesPrefixout .f]
 ::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(images) prefixout]
+#
+dphoto::gui::creeWidget logoQrcode $f -command {::dphoto::gui::qrcodeBool [dict get $::dphoto::gui::widgets(logoPath) path] [dict get $::dphoto::gui::widgets(logoQrcodetext) path]}
+set w [::dphoto::gui::creeWidget logoQrcodetext $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(logo) qrcodetext]
+#
+label  $f.lfLogo -text "Chemin vers le logo"
+set w [::dphoto::gui::creeWidget logoPath $f]
+::dphoto::gui::affValeurEntry $w [dict get $::dphoto::user(logo) path]
+button $f.bfLogo -text ... -command [list ::dphoto::gui::setFile $w ::dphoto::user(logo) path]
 #
 label  $f.llignes -text "Lignes de texte"
 set w [::dphoto::gui::creeWidget textLignes $f]
@@ -472,17 +513,21 @@ grid [dict get $::dphoto::gui::widgets(imagesInpath) path] -row $row -column 2 -
 grid $f.bdImages -row $row -column 3 -sticky news
 incr row
 
-grid $f.lfLogo -row $row -column 1 -sticky e
-grid [dict get $::dphoto::gui::widgets(logoPath) path] -row $row -column 2 -sticky news
-grid $f.bfLogo -row $row -column 3 -sticky news
-incr row
-
 grid $f.ldOut -row $row -column 1 -sticky e
 grid [dict get $::dphoto::gui::widgets(imagesRelativeoutpath) path] -row $row -column 2 -columnspan 2 -sticky news
 incr row
 
 grid $f.lfOut -row $row -column 1 -sticky e
 grid [dict get $::dphoto::gui::widgets(imagesPrefixout) path] -row $row -column 2 -columnspan 2 -sticky news
+incr row
+
+grid [dict get $::dphoto::gui::widgets(logoQrcode)     path] -row $row -column 1 -sticky news
+grid [dict get $::dphoto::gui::widgets(logoQrcodetext) path] -row $row -column 2 -columnspan 2 -sticky news
+incr row
+
+grid $f.lfLogo -row $row -column 1 -sticky e
+grid [dict get $::dphoto::gui::widgets(logoPath) path] -row $row -column 2 -sticky news
+grid $f.bfLogo -row $row -column 3 -sticky news
 incr row
 
 grid $f.llignes -row $row -column 1 -sticky e

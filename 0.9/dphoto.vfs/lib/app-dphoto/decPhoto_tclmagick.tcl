@@ -74,9 +74,7 @@ if {$::dphoto::gui::multithemes == 1 } {
 $wand draw $draw
 # sauvegarde 
 if {$test eq 0} {
-    set out [dict get $::dphoto::user(images) relativeoutpath]
-    file mkdir $out
-    eval $wand write [file join $out [dict get $::dphoto::user(images) prefixout]]
+    eval $wand write [file join $repsortie [dict get $::dphoto::user(images) prefixout]]
 } else {
     # affichage dans le canvas
     set canvas .h.c

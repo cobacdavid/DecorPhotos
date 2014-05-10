@@ -22,6 +22,7 @@ namespace eval dphoto {
 	variable widgets
 	variable generateDphoto
 	variable multithemes
+	variable qrcode
     }
     namespace eval traitement {
 	variable exif
@@ -30,13 +31,13 @@ namespace eval dphoto {
 }
 ##
 ##
-set dphoto::libdir  [file join $::topdir lib app-dphoto]
+set dphoto::libdir    [file join $::topdir lib app-dphoto]
 array set dphoto::files "
-    rc       [file join $::h decorphoto0.9.rc]
-    config   [file join $::dphoto::libdir config.tcl]
-    gui      [file join $::dphoto::libdir gui.tcl]
-    themes   [file join $::dphoto::libdir themes_tclmagick.tcl]
-    decphoto [file join $::dphoto::libdir decPhoto_tclmagick.tcl]
+    rc           [file join $::h decorphoto0.9.rc]
+    config       [file join $::dphoto::libdir config.tcl]
+    gui          [file join $::dphoto::libdir gui.tcl]
+    themes       [file join $::dphoto::libdir themes_tclmagick.tcl]
+    decphoto     [file join $::dphoto::libdir decPhoto_tclmagick.tcl]
 "
 ##################################################################
 ##################################################################
@@ -69,9 +70,10 @@ width 2
 lignes {le \$exif(date) \u00e0 \$exif(heure)\\n\u00a9 http://github.com/cobacdavid}
 }
    logo {
-path [file join $::r logo.jpg]
-size 200
-mode over
+path       [file join $::r logo.jpg]
+size       200
+mode       over
+qrcodetext {http://github.com/cobacdavid}
 }
    images {
 inpath          $::r

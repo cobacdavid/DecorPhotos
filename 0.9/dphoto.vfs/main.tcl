@@ -16,3 +16,4 @@ package require jpeg
 package require TclMagick
 package require TkMagick
 package require app-dphoto
+package require luaqrencode
