@@ -126,6 +126,26 @@ set ::dphoto::theme([incr j]) [list {Encadrement simple} \
 				 $theme_Xoff $theme_Xoff
 			 }]
 
+set ::dphoto::theme([incr j]) [list {Bordure} \
+			 {
+			     set bw [dict get $::dphoto::user(line) width]
+			     $wand border $userBg $bw $bw
+			     set w     [$wand width]
+			     set h     [$wand height]
+			 }]
+
+set ::dphoto::theme([incr j]) [list {Polaroid} \
+			 {
+			     set Xbordure [expr {int($w * .05)}]
+			     set Ybordure [expr {int($h * .25)}]
+			     $wand border $userBg $Xbordure $Ybordure
+			     $wand crop [$wand width] [expr {[$wand height]+ $Xbordure + $Ybordure}]\
+				 0 [expr {abs($Xbordure - $Ybordure)}]
+			     set w     [$wand width]
+			     set h     [$wand height]
+			     $draw translate 0 [expr {abs($Xbordure - $Ybordure)}]
+			 }]
+
 set ::dphoto::theme([incr j]) [list {Noir et Blanc} \
 			 {
 			     $wand imagetype grayscale

@@ -465,7 +465,8 @@ set indice [lsearch -exact $gendarmes  [dict get $::dphoto::user(font) name]]
 eval $w insert 0 $gendarmes
 $w selection set $indice
 $w see $indice
-bind $w <<ListboxSelect>> {dict set ::dphoto::user(font) name [%W get [%W curselection]]; $f.lTexte configure -font  [%W get [%W curselection]]}
+bind $w <<ListboxSelect>> {dict set ::dphoto::user(font) name [%W get [%W curselection]];
+    #$f.lTexte configure -font  [%W get [%W curselection]]}
 #
 set w [::dphoto::gui::creeWidget fontFg $fT -bg [dict get $::dphoto::user(font) fg]]
 bind $w <1> [list ::dphoto::gui::setCoul $w ::dphoto::user(font) fg]

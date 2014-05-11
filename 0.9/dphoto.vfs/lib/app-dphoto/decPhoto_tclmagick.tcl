@@ -97,7 +97,9 @@ if {$test eq 0} {
     $wand resize $ww $hw
     #
     magicktophoto $wand $cv 
-    eval .h.c create image [::dphoto::gui::centrage $wcv $hcv $ww $hw] -image $cv -anchor nw
+    eval .h.c create image [::dphoto::gui::centrage $wcv $hcv $ww $hw] -image $cv -anchor nw -tags I
+    set coordsEncadrement [.h.c bbox I]
+    .h.c create rectangle {*}$coordsEncadrement -width 2 -outline black
 }
 # nettoyage
 magick delete $draw

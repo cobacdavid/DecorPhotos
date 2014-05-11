@@ -67,7 +67,7 @@ bg    black
 width 2
 }
    text {
-lignes {le \$exif(date) \u00e0 \$exif(heure)\\n\u00a9 http://github.com/cobacdavid}
+lignes {le \$::exif(date) \u00e0 \$::exif(heure)\\n\u00a9 http://github.com/cobacdavid}
 }
    logo {
 path       [file join $::r logo.jpg]
