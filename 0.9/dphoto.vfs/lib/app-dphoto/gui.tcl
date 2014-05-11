@@ -14,7 +14,7 @@
 # dans ce tableau TOUT est lié à la variable ::dphoto::userDefault !!!
 #
 array set ::dphoto::gui::widgets {
-    fontName {key1 font key2 name parent .font name fN type listbox options {-height 5 -width 45 -exportselection 0}}
+    fontName {key1 font key2 name parent .font name fN type listbox options {-height 5 -width 35 -exportselection 0}}
     fontSize {key1 font key2 size parent .font name fS type entry options {-width 3}}
     fontFg   {key1 font key2 fg   parent .font name fF type label options {-relief ridge -borderwidth 3 -text "Couleur"}}
     fontBg   {key1 font key2 bg   parent .font name fB type label options {-relief ridge -borderwidth 3 -text "Couleur fond"}}
@@ -212,10 +212,16 @@ V\u00e9rifier que le r\u00e9pertoire choisi contienne bien ce type de fichiers."
     } else {
 	# sans fichier dphoto.txt on applique
 	# le même traitement à toutes les images
+	set compteur 0
+	.g.ok configure -state disabled
 	foreach inFile $listeJPG {
+	    ::dphoto::gui::pourcentage .g.ok [incr compteur] $nbFic
 	    ::dphoto::traitement::setExifInfo $inFile
 	    source $::dphoto::files(decphoto)
 	}
+	.g.ok configure -state normal
+	.g.ok configure -text "Traitement complet"
+	update
     }
 }
 
@@ -401,6 +407,11 @@ proc dphoto::traitement::setExifInfo {f} {
     }
     array set ::exif [array get ::dphoto::traitement::exif]
 }
+
+proc dphoto::gui::pourcentage {w k n} {
+    $w configure -text "$k sur $n"
+    update
+}
 ######################################################################################""
 # name clé dans la variable ::dphoto::gui::widgets
 # pathparent chemin complet du conteneur
@@ -584,14 +595,19 @@ labelframe $g -text "Traitement g\u00e9n\u00e9ral"
 
 button $g.ok   -text "Traitement complet" \
     -command [list ::dphoto::gui::okay 0]
+#bind $g.ok <1> [list ::dphoto::gui::okay 0]
 button $g.def  -text "Config par d\u00e9faut" -command [list ::dphoto::config::defaut]
 button $g.exit  -text Fermer -command ::dphoto::gui::fermeture
-pack $g.ok $g.exit $g.def -side left -fill x -expand 1
-
+pack $g.ok $g.exit $g.def -side left -fill x -expand 1 -padx 3
 ###
 pack $f $h -padx 5 -pady 5 -ipadx 5 -ipady 5 -fill both
 pack .moi -side right -padx 5
-pack $g  -padx 5 -pady 5  -ipadx 5 -ipady 5 -fill x
+pack $g  -padx 5 -pady 5  -ipadx 5 -ipady 5 -fill both
+
+# pack $f -side right -padx 5 -pady 5 -ipadx 5 -ipady 5 -fill both
+# pack .h  -padx 5 -pady 5 -ipadx 5 -ipady 5 -fill both
+# pack .moi -side right -padx 5
+#  pack $g  -padx 5 -pady 5  -ipadx 5 -ipady 5 -fill x
 
 ###
 wm resizable . 0 0

@@ -77,10 +77,13 @@ if {$test eq 0} {
     eval $wand write [file join $repsortie [dict get $::dphoto::user(images) prefixout]]
 } else {
     # affichage dans le canvas
+    set canvasOff 10
     set canvas .h.c
     $canvas delete all
-    set wcv [winfo width $canvas]
-    set hcv [winfo height $canvas]
+    set realwcv [winfo width $canvas ]
+    set realhcv [winfo height $canvas]
+    set wcv [expr {$realwcv - $canvasOff}]
+    set hcv [expr {$realhcv - $canvasOff}]
     set cv [image create photo]
     #
     set rapportWand [expr {1. * $w / $h}]
@@ -97,7 +100,7 @@ if {$test eq 0} {
     $wand resize $ww $hw
     #
     magicktophoto $wand $cv 
-    eval .h.c create image [::dphoto::gui::centrage $wcv $hcv $ww $hw] -image $cv -anchor nw -tags I
+    eval .h.c create image [::dphoto::gui::centrage $realwcv $realhcv $ww $hw] -image $cv -anchor nw -tags I
     set coordsEncadrement [.h.c bbox I]
     .h.c create rectangle {*}$coordsEncadrement -width 2 -outline black
 }

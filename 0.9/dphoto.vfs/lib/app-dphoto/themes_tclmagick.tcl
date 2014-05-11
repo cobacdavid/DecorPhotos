@@ -85,10 +85,11 @@ set ::dphoto::theme([incr j]) [list {logo seul en bas à droite} \
 			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
 			 }]
 
-set ::dphoto::theme([incr j]) [list {test composite avec logo} \
-			 {
-			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
-			 }]
+# set ::dphoto::theme([incr j]) [list {test composite avec logo} \
+# 			 {
+# 			     $wand composite $logo [dict get $::dphoto::user(logo) mode] [expr { $w - $wL - int($fa) }] [expr { $h - $hL - int($fa) }]
+#			 }]
+
 set ::dphoto::theme([incr j]) [list {logo en haut à gauche + lignes vert. et horiz. + lignes de textes} \
 			 {
 			     for {set i 0} {$i<$nbLignes} {incr i} {
