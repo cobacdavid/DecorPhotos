@@ -29,3 +29,8 @@ No internationalisation is yet provided but... never give up on a dream ;)
 
 # Screenshots
 ![Screenshot](http://img15.hostingpics.net/pics/128539screenshot.png)
+
+# qrencode
+
+*DecorPhotos* includes (the excellent) qrencode lib. from Patrick Gundlach.
+This lib is under the 3-clause BSD license (aka "new BSD").
