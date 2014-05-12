@@ -587,7 +587,12 @@ foreach {x y t opt} $logo {
     eval .moi create text $x $y -text $t $opt
 }
 bind .moi <1> {tk_messageBox -message \
-		   "David Cobac david.cobac@gmail.com\nMade In Angers (49)\nAvril 2010-Mai 2014"\
+		   "David Cobac <david.cobac@gmail.com>
+Made In Angers (49)
+Avril 2010-Mai 2014
+
+Credits : Patrick Gundlach pour l'encodage qrcode contenu dans ce logiciel.
+'The qrcode library is licensed under the 3-clause BSD license' "\
 		   -title information -type ok}
 
 ###
